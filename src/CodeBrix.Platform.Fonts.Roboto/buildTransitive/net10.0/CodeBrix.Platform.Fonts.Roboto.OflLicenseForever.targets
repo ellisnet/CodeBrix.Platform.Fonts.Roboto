@@ -3,8 +3,8 @@
       Prunes the redundant static Roboto fonts at consumer build time,
       hooking into the CodeBrix.Platform asset pipeline.
 
-      This target hooks AfterTargets="_CodeBrixAddLibraryAssets" -- the asset
-      target defined by the CodeBrix.Platform UI build tasks. Hooking that
+      This target hooks AfterTargets="_CodeBrixAddLibraryAssets" (the asset
+      target defined by the CodeBrix.Platform UI build tasks). Hooking that
       target is what makes this prune actually run during a CodeBrix.Platform
       app build.
 
@@ -15,8 +15,8 @@
         * The variable font Roboto.ttf is intentionally NEVER removed. Consumers
           (and the CodeBrix.Platform default-font configuration) reference it by
           the direct path ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf,
-          so it must stay present on every platform -- including manifest-capable
-          ones -- for those references to resolve.
+          so it must stay present on every platform (including manifest-capable
+          ones) for those references to resolve.
     -->
     <Target Name="CodeBrixRemoveUnusedRoboto" AfterTargets="_CodeBrixAddLibraryAssets">
         <ItemGroup>
