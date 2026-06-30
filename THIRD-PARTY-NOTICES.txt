@@ -1,0 +1,117 @@
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+
+CodeBrix.Platform.Fonts.Roboto is a CodeBrix-family redistribution of the
+Roboto font family, packaged as a .NET 10 NuGet library. The package
+incorporates one piece of third-party material:
+
+  1. The Roboto font family (SIL OFL 1.1) — the actual `.ttf` font files
+     themselves, originally designed by Christian Robertson and maintained
+     by the Google Fonts team as the Roboto Project.
+
+The CodeBrix-authored parts of this package — the `.csproj`, the
+buildTransitive `.targets` file, the `.ttf.manifest` JSON, the `.uprimarker`
+marker, the documentation, and the packaging metadata — are original to the
+CodeBrix family and contain no third-party source code. They are released,
+together with the bundled font files, under the SIL Open Font License,
+Version 1.1, the same license as the fonts. The full license text is bundled
+with this repository as `OFL.txt` at the repository root and is also packaged
+inside the produced NuGet under the same name.
+
+================================================================================
+
+1. Roboto Font Family
+   ------------------
+   Project URL:    https://github.com/googlefonts/roboto-classic
+   Designer:       Christian Robertson
+   Copyright:      Copyright 2011 The Roboto Project Authors
+                   (https://github.com/googlefonts/roboto-classic)
+   License:        SIL Open Font License, Version 1.1
+
+   Note on naming: the Roboto copyright statement declares NO Reserved Font
+   Name, so SIL OFL 1.1 condition 3 (the Reserved Font Name restriction) does
+   not apply to this family. The `.ttf` files are redistributed bit-for-bit
+   unmodified.
+
+   Files redistributed from this upstream project (binary `.ttf` files):
+
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf
+         (the Roboto variable font covering the weight axis 100-900 plus the
+          width axis; renamed from the upstream variable-font filename
+          `Roboto-VariableFont_wdth,wght.ttf` to the conventional
+          family-name filename `Roboto.ttf` — the font bytes are unchanged)
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Light.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-LightItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Regular.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Italic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Medium.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-MediumItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-SemiBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-SemiBoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Bold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-BoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-ExtraBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-ExtraBoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-Light.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-LightItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-Regular.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-Italic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-Medium.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-MediumItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-SemiBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-SemiBoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-Bold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-BoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-ExtraBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-ExtraBoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-Light.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-LightItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-Regular.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-Italic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-Medium.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-MediumItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-SemiBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-SemiBoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-Bold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-BoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-ExtraBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_SemiCondensed-ExtraBoldItalic.ttf
+
+   Modifications made during redistribution:
+     - Only the six weights Light (300), Regular (400), Medium (500),
+       SemiBold (600), Bold (700), and ExtraBold (800) are shipped as static
+       instances; the upstream Thin (100), ExtraLight (200), and Black (900)
+       static instances are not included. (Those weights remain reachable
+       through the bundled variable font.)
+     - The upstream upright variable font `Roboto-VariableFont_wdth,wght.ttf`
+       was renamed to `Roboto.ttf`. No `.ttf` binary content was altered.
+     - The separate upstream italic variable font
+       `Roboto-Italic-VariableFont_wdth,wght.ttf` is not included; italic
+       styles are provided through the static instances.
+
+   The full SIL Open Font License Version 1.1 text is reproduced in
+   `OFL.txt` at the root of this repository, and is also packaged inside
+   the produced NuGet under the same name.
+
+================================================================================
+
+License statement
+-----------------
+
+The combined work is published under the SPDX expression `OFL-1.1`. SIL OFL
+1.1 is a permissive font license that explicitly allows fonts to be bundled
+and redistributed alongside any other software (condition 2). The
+CodeBrix-authored wrapper, build logic, and packaging metadata are released
+under the same SIL OFL 1.1 as the bundled font files.
+
+Jeremy Ellis and contributors license the CodeBrix.Platform.Fonts.Roboto
+project to you under the terms set forth in the LICENSE / OFL.txt file (SIL
+OFL 1.1), located at the root of this repository.
+
+If you have any questions about any third-party code or assets referenced
+here, or if you believe that any third-party material has been included in
+CodeBrix.Platform.Fonts.Roboto in error, please open a new issue at:
+https://github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto/issues
+
+================================================================================
+
+END OF THIRD-PARTY SOFTWARE NOTICES AND INFORMATION

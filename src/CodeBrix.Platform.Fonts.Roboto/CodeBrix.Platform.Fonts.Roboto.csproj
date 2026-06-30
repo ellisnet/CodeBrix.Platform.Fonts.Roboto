@@ -1,0 +1,96 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>CodeBrix.Platform.Fonts.Roboto</AssemblyName>
+    <RootNamespace>CodeBrix.Platform.Fonts.Roboto</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <IncludeContentInPack>true</IncludeContentInPack>
+  </PropertyGroup>
+
+  <!--
+    Package / assembly version: date-stamped and auto-incrementing.
+
+    Format:  1.<x>.<y>.<z>   (every field is derived from UTC "now")
+
+      1  (major)     Always 1 for this library.
+      x  (minor)     Whole years since $(_VersionBaseYear).
+                     With base 2026: 2026=0, 2027=1, 2028=2, ...
+      y  (build)     Day of year, 1-based inclusive, UTC.
+                     Jan 1 = 1, Feb 1 = 32, Dec 31 = 365 (366 in a leap year).
+      z  (revision)  Minute of day, UTC, range 0 to 1439.
+                     00:00 = 0, 23:59 = 1439.
+
+    The version is always strictly increasing over time:
+      * within a day, z grows;
+      * at a day boundary, y increments and outranks z resetting to 0;
+      * at a (UTC) year boundary, x increments and outranks y and z resetting.
+
+    Notes / caveats:
+      * All fields read from System.DateTime.UtcNow, so a local dev build and a
+        UTC CI build agree on the value. Math.Floor on the minutes keeps z in
+        0..1439 (plain rounding could land on 1440 late in the day).
+      * Because the value depends on the clock, every build produces a NEW
+        version. With GeneratePackageOnBuild=true that means a fresh .nupkg on
+        each build, and two builds in the SAME UTC minute produce the SAME
+        version (so do not publish two packages from within one minute).
+      * This is date-stamp versioning, not SemVer: minor encodes the year and
+        major is pinned to 1, so major/minor do not signal API compatibility.
+      * To re-baseline the minor number, change _VersionBaseYear below.
+  -->
+  <PropertyGroup>
+    <_VersionBaseYear>2026</_VersionBaseYear>
+    <_VersionYears>$([MSBuild]::Subtract($([System.DateTime]::UtcNow.Year), $(_VersionBaseYear)))</_VersionYears>
+    <_VersionDayOfYear>$([System.DateTime]::UtcNow.DayOfYear)</_VersionDayOfYear>
+    <_VersionMinuteOfDay>$([System.Convert]::ToInt32($([System.Math]::Floor($([System.DateTime]::UtcNow.TimeOfDay.TotalMinutes)))))</_VersionMinuteOfDay>
+    <BuildVersion>1.$(_VersionYears).$(_VersionDayOfYear).$(_VersionMinuteOfDay)</BuildVersion>
+    <Version>$(BuildVersion)</Version>
+    <AssemblyVersion>$(BuildVersion)</AssemblyVersion>
+    <FileVersion>$(BuildVersion)</FileVersion>
+  </PropertyGroup>
+
+  <!-- NuGet package properties -->
+  <PropertyGroup>
+    <PackageId>CodeBrix.Platform.Fonts.Roboto.OflLicenseForever</PackageId>
+    <Product>CodeBrix.Platform.Fonts.Roboto</Product>
+    <Title>CodeBrix.Platform.Fonts.Roboto</Title>
+    <Authors>Jeremy Ellis</Authors>
+    <Description>A .NET 10 redistribution of the Roboto font family, packaged for the CodeBrix family. Ships the Roboto variable font plus 36 static .ttf files (Light/Regular/Medium/SemiBold/Bold/ExtraBold weights in Normal/Italic styles across Normal/Condensed/SemiCondensed stretches), a font .ttf.manifest JSON, and a buildTransitive .targets file that prunes the unused static font set at consumer-build time. The whole package, code and fonts alike, is distributed under the SIL Open Font License 1.1.</Description>
+    <PackageLicenseExpression>OFL-1.1</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>icon-codebrix-128.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Roboto font (c) 2011 The Roboto Project Authors, distributed under SIL OFL 1.1.</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <IsPackable>true</IsPackable>
+    <PackageTags>Roboto;font;fonts;Platform;variable-font;SIL-OFL;CodeBrix</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\icon-codebrix-128.png"     Pack="true" PackagePath="" />
+    <None Include="..\..\README.md"                  Pack="true" PackagePath="" />
+    <None Include="..\..\AGENT-README.txt"           Pack="true" PackagePath="" />
+    <None Include="..\..\THIRD-PARTY-NOTICES.txt"    Pack="true" PackagePath="" />
+    <None Include="..\..\OFL.txt"                    Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="CodeBrix.Platform.Fonts.Roboto.uprimarker"
+          Pack="true"
+          PackagePath="lib/net10.0" />
+    <None Include="Fonts/*.ttf"
+          Pack="true"
+          PackagePath="lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/" />
+    <None Include="Fonts/Roboto.ttf.manifest"
+          Pack="true"
+          PackagePath="lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/" />
+    <None Include="buildTransitive\**\*"
+          Pack="true"
+          PackagePath="buildTransitive/" />
+  </ItemGroup>
+
+</Project>

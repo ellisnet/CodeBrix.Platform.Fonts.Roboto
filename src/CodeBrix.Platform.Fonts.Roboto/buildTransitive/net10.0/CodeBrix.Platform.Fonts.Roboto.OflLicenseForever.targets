@@ -1,0 +1,30 @@
+<Project>
+    <!--
+      Prunes the redundant static Roboto fonts at consumer build time,
+      hooking into the CodeBrix.Platform asset pipeline.
+
+      This target hooks AfterTargets="_CodeBrixAddLibraryAssets" -- the asset
+      target defined by the CodeBrix.Platform UI build tasks. Hooking that
+      target is what makes this prune actually run during a CodeBrix.Platform
+      app build.
+
+      Behaviour:
+        * On platforms that do NOT support the font manifest, the static font
+          files (their names contain a dash) are removed, leaving only the
+          variable font Roboto.ttf.
+        * The variable font Roboto.ttf is intentionally NEVER removed. Consumers
+          (and the CodeBrix.Platform default-font configuration) reference it by
+          the direct path ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf,
+          so it must stay present on every platform -- including manifest-capable
+          ones -- for those references to resolve.
+    -->
+    <Target Name="CodeBrixRemoveUnusedRoboto" AfterTargets="_CodeBrixAddLibraryAssets">
+        <ItemGroup>
+            <!-- Static font files contain a dash in the name, so that's what we remove. -->
+            <!-- For platforms that already support variable fonts, we remove the static font files. -->
+            <_AllChildProjectItemsWithTargetPath
+                Remove="$(MSBuildThisFileDirectory)..\..\lib\net10.0\CodeBrix.Platform.Fonts.Roboto\Fonts\**-**.ttf"
+                Condition="'$(SupportsFontManifest)'!='true'" />
+        </ItemGroup>
+    </Target>
+</Project>
