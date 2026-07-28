@@ -2,6 +2,7 @@
 
 A redistribution of the Roboto font family packaged as a CodeBrix-family NuGet library for .NET 10 applications.
 CodeBrix.Platform.Fonts.Roboto is a content-files font package for CodeBrix.Platform-forked applications — supplying the Roboto variable font and its static instances as build-time assets — and is equally usable as a plain content-files NuGet in any .NET 10 project that wants the Roboto font set.
+Roboto covers the Latin, Greek and Cyrillic scripts but not Armenian or Georgian, so this package also bundles two Noto Sans companion families that supply those scripts in a matching sans design.
 The library has no managed dependencies other than .NET, and is provided as a .NET 10 library and associated `CodeBrix.Platform.Fonts.Roboto.OflLicenseForever` NuGet package.
 
 CodeBrix.Platform.Fonts.Roboto supports applications and assemblies that target Microsoft .NET version 10.0 and later.
@@ -12,8 +13,12 @@ Please update your C#/.NET code and projects to the latest LTS version of Micros
 
 * The Roboto variable font (`Roboto.ttf`) covering the full weight axis (100-900) and width axis, used directly on every platform.
 * 36 static `.ttf` font files covering the Light/Regular/Medium/SemiBold/Bold/ExtraBold weights in Normal, Italic, Condensed, Condensed-Italic, SemiCondensed, and SemiCondensed-Italic stretches — for platforms that resolve fonts through the static-instance manifest.
-* A `.ttf.manifest` JSON file that maps `font_style` / `font_weight` / `font_stretch` triples to the matching static font file.
-* A `buildTransitive` MSBuild `.targets` file (hooking into the CodeBrix.Platform `_CodeBrixAddLibraryAssets` target) that prunes the redundant static font files at build time on platforms that don't need them, while always keeping the variable `Roboto.ttf` available.
+* Two companion font families that extend script coverage beyond what Roboto itself carries:
+  * **Noto Sans Armenian** (`NotoSansArmenian.ttf` plus 6 static instances) — the Armenian script.
+  * **Noto Sans Georgian** (`NotoSansGeorgian.ttf` plus 6 static instances) — the Georgian script.
+* A `.ttf.manifest` JSON file per family that maps `font_style` / `font_weight` / `font_stretch` triples to the matching static font file.
+* A `CODEBRIX-DEVELOP.json` descriptor that tells CodeBrix.Develop how to wire this font into a generated application and which software-keyboard layouts the package's glyph coverage supports.
+* A `buildTransitive` MSBuild `.targets` file (hooking into the CodeBrix.Platform `_CodeBrixAddLibraryAssets` target) that prunes the redundant static font files at build time on platforms that don't need them, while always keeping the three variable fonts available.
 * The CodeBrix `.uprimarker` file so CodeBrix.Platform build pipelines discover the package as a UPRI-bearing font asset library.
 
 ## Sample Code
@@ -22,14 +27,14 @@ Please update your C#/.NET code and projects to the latest LTS version of Micros
 
 ```xml
 <TextBlock Text="Hello, world."
-           FontFamily="ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf#Roboto" />
+           FontFamily="ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf" />
 ```
 
 ### Reference a specific static weight
 
 ```xml
 <TextBlock Text="Bold sample"
-           FontFamily="ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Bold.ttf#Roboto" />
+           FontFamily="ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Bold.ttf" />
 ```
 
 ### Set Roboto as the default text font (CodeBrix.Platform app)
@@ -39,8 +44,12 @@ global::CodeBrix.Platform.UI.FeatureConfiguration.Font.DefaultTextFontFamily =
     "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf";
 ```
 
+Note that the font URI carries no `#FamilyName` fragment. CodeBrix.Platform strips such a fragment before resolving the font, and leaving it on the value assigned to `DefaultTextFontFamily` prevents the startup font-manifest preload from finding the manifest.
+
 ## License
 
-The entire package — the library code, the `.targets` file, the packaging wrapper, and the bundled Roboto `.ttf` font files — is licensed under the SIL Open Font License, Version 1.1. see: https://en.wikipedia.org/wiki/SIL_Open_Font_License
+The entire package — the library code, the `.targets` file, the packaging wrapper, and the bundled Roboto and Noto Sans `.ttf` font files — is licensed under the SIL Open Font License, Version 1.1. see: https://en.wikipedia.org/wiki/SIL_Open_Font_License
 
 The full license text is bundled with this repository as `OFL.txt` at the repository root and is also packaged inside the produced NuGet under the same name. The package is published under the SPDX expression `OFL-1.1`.
+
+See `THIRD-PARTY-NOTICES.txt` for the full attribution of all three bundled font families.

@@ -22,4 +22,21 @@ internal static class TestAssetPaths
 
     public static string TargetsFilePath { get; } =
         Path.Combine(TestAssetsRoot, "buildTransitive", "net10.0", "CodeBrix.Platform.Fonts.Roboto.OflLicenseForever.targets");
+
+    public static string DescriptorPath { get; } =
+        Path.Combine(TestAssetsRoot, "CODEBRIX-DEVELOP.json");
+
+    /// <summary>
+    /// The companion families that supply the scripts Roboto itself does not
+    /// carry: Armenian and Georgian. Each ships a variable font plus its own
+    /// manifest. (Roboto already covers Greek, so no Greek companion is needed.)
+    /// </summary>
+    public static string[] CompanionFamilies { get; } =
+        ["NotoSansArmenian", "NotoSansGeorgian"];
+
+    public static string CompanionFontPath(string family) =>
+        Path.Combine(FontsFolder, family + ".ttf");
+
+    public static string CompanionManifestPath(string family) =>
+        Path.Combine(FontsFolder, family + ".ttf.manifest");
 }

@@ -1,16 +1,22 @@
 THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
 
 CodeBrix.Platform.Fonts.Roboto is a CodeBrix-family redistribution of the
-Roboto font family, packaged as a .NET 10 NuGet library. The package
-incorporates one piece of third-party material:
+Roboto font family, packaged as a .NET 10 NuGet library. Roboto covers the
+Latin, Greek and Cyrillic scripts but not Armenian or Georgian, so this
+package additionally bundles two Noto Sans companion families that supply
+those scripts. The package therefore incorporates three pieces of
+third-party material:
 
   1. The Roboto font family (SIL OFL 1.1) — the actual `.ttf` font files
      themselves, originally designed by Christian Robertson and maintained
      by the Google Fonts team as the Roboto Project.
+  2. The Noto Sans Armenian font family (SIL OFL 1.1) — the Armenian companion.
+  3. The Noto Sans Georgian font family (SIL OFL 1.1) — the Georgian companion.
 
 The CodeBrix-authored parts of this package — the `.csproj`, the
-buildTransitive `.targets` file, the `.ttf.manifest` JSON, the `.uprimarker`
-marker, the documentation, and the packaging metadata — are original to the
+buildTransitive `.targets` file, the `.ttf.manifest` JSON files, the
+`CODEBRIX-DEVELOP.json` descriptor, the `.uprimarker` marker, the
+documentation, and the packaging metadata — are original to the
 CodeBrix family and contain no third-party source code. They are released,
 together with the bundled font files, under the SIL Open Font License,
 Version 1.1, the same license as the fonts. The full license text is bundled
@@ -94,6 +100,72 @@ inside the produced NuGet under the same name.
 
 ================================================================================
 
+2. Noto Sans Armenian Font Family (Armenian companion)
+   ---------------------------------------------------
+   Project URL:    https://github.com/notofonts/armenian
+   Copyright:      Copyright 2022 The Noto Project Authors
+                   (https://github.com/notofonts/armenian)
+   License:        SIL Open Font License, Version 1.1
+
+   Note on naming: the Noto Sans Armenian copyright statement declares NO
+   Reserved Font Name, so SIL OFL 1.1 condition 3 does not apply to this
+   family. The `.ttf` files are redistributed bit-for-bit unmodified.
+
+   Why it is bundled: Roboto does not cover the Armenian script.
+
+   Files redistributed from this upstream project (binary `.ttf` files):
+
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-Bold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-ExtraBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-Light.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-Medium.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-Regular.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-SemiBold.ttf
+
+   Modifications made during redistribution:
+     - Only the six weights Light (300) through ExtraBold (800) are shipped as
+       static instances, in the Normal stretch. Upstream publishes no italic
+       face for this family, so italic Armenian text renders upright.
+     - The upstream upright variable font
+       `NotoSansArmenian-VariableFont_wdth,wght.ttf` was renamed to
+       `NotoSansArmenian.ttf`. No `.ttf` binary content was altered.
+
+================================================================================
+
+3. Noto Sans Georgian Font Family (Georgian companion)
+   ---------------------------------------------------
+   Project URL:    https://github.com/notofonts/georgian
+   Copyright:      Copyright 2022 The Noto Project Authors
+                   (https://github.com/notofonts/georgian)
+   License:        SIL Open Font License, Version 1.1
+
+   Note on naming: the Noto Sans Georgian copyright statement declares NO
+   Reserved Font Name, so SIL OFL 1.1 condition 3 does not apply to this
+   family. The `.ttf` files are redistributed bit-for-bit unmodified.
+
+   Why it is bundled: Roboto does not cover the Georgian script.
+
+   Files redistributed from this upstream project (binary `.ttf` files):
+
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian-Bold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian-ExtraBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian-Light.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian-Medium.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian-Regular.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian-SemiBold.ttf
+
+   Modifications made during redistribution:
+     - Only the six weights Light (300) through ExtraBold (800) are shipped as
+       static instances, in the Normal stretch. Upstream publishes no italic
+       face for this family, so italic Georgian text renders upright.
+     - The upstream upright variable font
+       `NotoSansGeorgian-VariableFont_wdth,wght.ttf` was renamed to
+       `NotoSansGeorgian.ttf`. No `.ttf` binary content was altered.
+
+================================================================================
+
 License statement
 -----------------
 
@@ -101,7 +173,8 @@ The combined work is published under the SPDX expression `OFL-1.1`. SIL OFL
 1.1 is a permissive font license that explicitly allows fonts to be bundled
 and redistributed alongside any other software (condition 2). The
 CodeBrix-authored wrapper, build logic, and packaging metadata are released
-under the same SIL OFL 1.1 as the bundled font files.
+under the same SIL OFL 1.1 as the bundled font files, as are the bundled
+Noto Sans companion fonts.
 
 Jeremy Ellis and contributors license the CodeBrix.Platform.Fonts.Roboto
 project to you under the terms set forth in the LICENSE / OFL.txt file (SIL

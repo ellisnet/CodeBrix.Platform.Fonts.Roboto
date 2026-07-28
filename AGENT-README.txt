@@ -13,21 +13,30 @@ variable font and a curated set of static instances as build-time content
 assets for CodeBrix.Platform-forked applications, and is equally usable as
 a plain content-files NuGet in any .NET 10 project.
 
+Roboto covers the Latin, Greek and Cyrillic scripts but NOT Armenian or
+Georgian. This package therefore also bundles two Noto Sans COMPANION
+families that supply those scripts in a matching sans design. That is the
+one structural difference from the sibling CodeBrix.Platform.Fonts.OpenSans
+package, and it is the thing to understand before changing anything here.
+
 The library has effectively no managed code: the assembly is a metadata-
 only .NET 10 DLL whose sole purpose is to host the bundled font content
 files. The interesting payload lives in:
 
-  - 37 `.ttf` font files (1 variable + 36 static) under
+  - 51 `.ttf` font files (3 variable + 48 static) under
     lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/ inside the nupkg.
-  - A `.ttf.manifest` JSON that maps font_style/font_weight/font_stretch
-    triples to the matching static font file path.
+  - Three `.ttf.manifest` JSON files (one per family) mapping
+    font_style/font_weight/font_stretch triples to the matching static
+    font file path.
+  - A `CODEBRIX-DEVELOP.json` descriptor at the package root that tells
+    CodeBrix.Develop how to wire this font into a generated application.
   - A `.uprimarker` file that CodeBrix.Platform build pipelines use to
     discover UPRI-bearing font asset packages.
   - An MSBuild `.targets` file under buildTransitive/net10.0/ that hooks
     into the CodeBrix.Platform `_CodeBrixAddLibraryAssets` target and
     prunes the redundant static fonts at consumer-build time, depending on
-    the `SupportsFontManifest` MSBuild property — while always keeping the
-    variable `Roboto.ttf` present.
+    the `SupportsFontManifest` MSBuild property — while always keeping all
+    three variable fonts present.
 
 
 INSTALLATION
@@ -54,13 +63,23 @@ files via `ms-appx:///` URIs rooted at the assembly content folder:
   ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf
   ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Bold.ttf
   ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-Regular.ttf
+  ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian.ttf
   ...etc.
+
+Do NOT append a `#FamilyName` fragment to these URIs. CodeBrix.Platform
+strips the fragment before resolving the font, so it buys nothing — and
+on the value assigned to `FeatureConfiguration.Font.DefaultTextFontFamily`
+it actively breaks the startup font-manifest preload, because the
+".manifest" suffix the preload appends lands inside the URI fragment and
+is then dropped.
 
 
 FONT INVENTORY
 ========================================================================
 
-The package ships 37 `.ttf` files plus 1 `.ttf.manifest`:
+The package ships 51 `.ttf` files plus 3 `.ttf.manifest` files.
+
+PRIMARY FAMILY — Roboto (37 files)
 
 Variable font (always present on every platform):
   Roboto.ttf  — covers the weight axis (100-900) plus the width axis.
@@ -80,10 +99,66 @@ Static fonts (used where fonts are resolved via the static manifest):
   keeps the static set aligned with the sibling CodeBrix.Platform.Fonts
   packages.
 
-Manifest:
-  Roboto.ttf.manifest — JSON array of 36 entries mapping
-    {font_style, font_weight, font_stretch} triples to the matching
-    static font file's `ms-appx:///` URI.
+COMPANION FAMILIES (14 files)
+
+  NotoSansArmenian.ttf + 6 statics  — supplies the ARMENIAN script.
+                                      Six weights, Normal stretch,
+                                      upright only.
+  NotoSansGeorgian.ttf + 6 statics  — supplies the GEORGIAN script.
+                                      Six weights, Normal stretch,
+                                      upright only.
+
+  Neither family has an italic face upstream, so italic text in those
+  scripts renders upright. That is a known upstream limitation, not a
+  packaging defect. Roboto already covers Greek natively, so there is no
+  Greek companion here (unlike the sibling Merriweather package).
+
+Manifests:
+  Roboto.ttf.manifest            — 36 entries
+  NotoSansArmenian.ttf.manifest  —  6 entries
+  NotoSansGeorgian.ttf.manifest  —  6 entries
+
+  Each is a JSON object with a `fonts` array mapping
+  {font_style, font_weight, font_stretch} triples to the matching static
+  font file's `ms-appx:///` URI.
+
+
+CODEBRIX-DEVELOP.JSON
+========================================================================
+
+`CODEBRIX-DEVELOP.json` sits at the repository root and is packed to the
+root of the nupkg. It is the font's self-description for CodeBrix.Develop's
+"New CodeBrix.Platform Application" experience: the IDE reads it to learn
+how to wire this font into a generated application, instead of carrying
+per-font swap logic of its own.
+
+  schemaVersion     Always 1 today. A consumer that does not recognise
+                    the value should decline the font with a clear
+                    message rather than guess.
+  packageId         Must equal this package's NuGet PackageId.
+  displayName       The typographic family name shown to the user, and
+                    the authoritative value written into generated source.
+  fontFamilyUri     The ms-appx URI of the primary font. No `#` fragment.
+  resourceKey       The App.xaml resource key a generated application
+                    uses (`RobotoFont`).
+  fallbackFontUris  Ordered ms-appx URIs of the companion fonts, consulted
+                    for codepoints the primary font lacks. Absent or empty
+                    means the package has no companions.
+  keyboardLayouts   The software-keyboard layout ids this package's glyph
+                    coverage supports, as the UNION across the primary
+                    font and its companions. Ids absent from this list are
+                    not supported; there is deliberately no "unsupported"
+                    list, so the complement of the platform's layout set
+                    is always the correct answer.
+
+The array is generated, not hand-written — see PROVENANCE below.
+
+IMPORTANT: `keyboardLayouts` currently claims all 38 layouts, including
+`ka` and `hy`, which are delivered by the companion fonts. Those two
+require CodeBrix.Platform to consult `fallbackFontUris` when the primary
+font lacks a glyph. If you are reading this before that support shipped,
+the claim runs ahead of the runtime by design — it was published
+deliberately, with the platform work following immediately.
 
 
 CORE API REFERENCE
@@ -138,14 +213,18 @@ Repository layout:
         Roboto-{Light|Regular|Medium|SemiBold|Bold|ExtraBold}{Italic?}.ttf
         Roboto_Condensed-{Weight}{Italic?}.ttf
         Roboto_SemiCondensed-{Weight}{Italic?}.ttf
+        NotoSansArmenian.ttf / .ttf.manifest / NotoSansArmenian-{Weight}.ttf
+        NotoSansGeorgian.ttf / .ttf.manifest / NotoSansGeorgian-{Weight}.ttf
     tests/CodeBrix.Platform.Fonts.Roboto.Tests/
       CodeBrix.Platform.Fonts.Roboto.Tests.csproj
       AssemblyMetadataTests.cs
       ContentFilePresenceTests.cs
       ContentManifestTests.cs
+      DescriptorTests.cs
       TargetsFileTests.cs
       TestAssetPaths.cs
     AGENT-README.txt
+    CODEBRIX-DEVELOP.json
     LICENSE                  (SIL OFL 1.1)
     OFL.txt                  (SIL OFL 1.1; identical to LICENSE)
     README.md
@@ -156,8 +235,9 @@ Inside the produced NuGet (.nupkg), the file layout is:
   lib/net10.0/CodeBrix.Platform.Fonts.Roboto.dll
   lib/net10.0/CodeBrix.Platform.Fonts.Roboto.uprimarker
   lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/*.ttf
-  lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf.manifest
+  lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/*.ttf.manifest
   AGENT-README.txt
+  CODEBRIX-DEVELOP.json
   README.md
   OFL.txt
   THIRD-PARTY-NOTICES.txt
@@ -209,12 +289,20 @@ Tests live under tests/CodeBrix.Platform.Fonts.Roboto.Tests/. Run with:
 
 The test suite covers:
 
-  * Manifest JSON: that Roboto.ttf.manifest deserializes cleanly, contains
-    the expected number of entries (36), and that every entry's
-    family_name path is rooted at
-    `ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/`.
-  * Content-file presence: that all 36 static `.ttf` files referenced by
-    the manifest plus the variable `Roboto.ttf` (37 total) exist on disk
+  * Manifest JSON: that all three `.ttf.manifest` files deserialize
+    cleanly, carry the expected entry counts (36/6/6), cover the six
+    weights, and that every entry's family_name path is rooted at
+    `ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/` and points at a
+    file that exists on disk. Also that the two companion manifests are
+    upright-only, so that limitation stays a decision rather than an
+    accident.
+  * Descriptor: that CODEBRIX-DEVELOP.json declares schemaVersion 1, its
+    packageId matches the published PackageId, its fontFamilyUri and every
+    fallbackFontUri carry no `#` fragment and point at fonts this package
+    actually ships, and that keyboardLayouts has no duplicates and claims
+    the scripts the companions exist to supply.
+  * Content-file presence: that all 48 static `.ttf` files plus the three
+    variable fonts (51 total) exist on disk
     next to the test assembly's expected build-output font folder
     (resolved via `AppContext.BaseDirectory` + `TestAssets/Fonts/`,
     centralized in `TestAssetPaths`).
@@ -233,10 +321,19 @@ PROVENANCE
 This package is not a port of any upstream packaging project. The
 `.csproj`, `.targets`, `.ttf.manifest`, `.uprimarker`, and documentation
 are original CodeBrix-family files. The only third-party material is the
-Roboto `.ttf` font binaries, which are redistributed bit-for-bit
-unmodified. Their per-file provenance and the SIL OFL 1.1 terms are
-recorded in THIRD-PARTY-NOTICES.txt (binary `.ttf` files cannot carry an
-inline provenance comment).
+Roboto and Noto Sans `.ttf` font binaries, which are redistributed
+bit-for-bit unmodified. Their per-file provenance and the SIL OFL 1.1
+terms are recorded in THIRD-PARTY-NOTICES.txt (binary `.ttf` files cannot
+carry an inline provenance comment).
+
+The `keyboardLayouts` array in CODEBRIX-DEVELOP.json is GENERATED, not
+hand-written: it is computed by intersecting each software-keyboard
+layout's required character set (from the layout definitions in
+CodeBrix.Platform) against the `cmap` of every font this package ships,
+then taking the union across the primary font and its companions. Nothing
+in this repository's build reads CodeBrix.Platform — the array is computed
+by a developer-run tool and checked in as data. Regenerate it whenever the
+platform's layout set changes or this package's font set changes.
 
 
 KNOWN GOTCHAS
@@ -255,11 +352,22 @@ KNOWN GOTCHAS
     file must be updated in lockstep — otherwise the conditional pruning
     of static fonts will silently stop firing.
 
-  * The variable `Roboto.ttf` is deliberately never pruned, because the
-    CodeBrix.Platform default-font configuration and typical consumer XAML
-    reference it by its direct `ms-appx:///.../Roboto.ttf` path. Do not add
-    a branch that removes it, or those references will break on manifest-
-    capable platforms.
+  * The three variable fonts are deliberately never pruned. For Roboto.ttf
+    that is the usual reason (the CodeBrix.Platform default-font
+    configuration and typical consumer XAML reference it by its direct
+    `ms-appx:///.../Roboto.ttf` path). For the two companions it matters
+    MORE: they are the only source of Armenian and Georgian in this
+    package, so pruning them would silently drop two scripts rather than
+    merely degrade weights. The prune matches only dash-bearing filenames,
+    which is why the companion variable fonts are named without a dash.
+
+  * NEVER add a `#FamilyName` fragment to a font URI in this package's
+    documentation or descriptor. CodeBrix.Platform strips it during font
+    resolution, and on `DefaultTextFontFamily` it silently disables the
+    startup manifest preload (the appended ".manifest" lands inside the
+    fragment and is dropped by `Uri.PathAndQuery`). Earlier revisions of
+    this README used the `#Roboto` form in its XAML samples; that was
+    inherited convention, not a fix for anything.
 
   * Roboto's copyright statement declares no Reserved Font Name, so SIL OFL
     1.1 condition 3 does not restrict the display name. The `.ttf` binaries

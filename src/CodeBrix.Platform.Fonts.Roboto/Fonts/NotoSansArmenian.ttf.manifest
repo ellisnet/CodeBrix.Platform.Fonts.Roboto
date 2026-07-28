@@ -1,0 +1,40 @@
+{
+  "fonts": [
+    {
+      "font_style": "Normal",
+      "font_weight": 300,
+      "font_stretch": "Normal",
+      "family_name": "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-Light.ttf"
+    },
+    {
+      "font_style": "Normal",
+      "font_weight": 400,
+      "font_stretch": "Normal",
+      "family_name": "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-Regular.ttf"
+    },
+    {
+      "font_style": "Normal",
+      "font_weight": 500,
+      "font_stretch": "Normal",
+      "family_name": "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-Medium.ttf"
+    },
+    {
+      "font_style": "Normal",
+      "font_weight": 600,
+      "font_stretch": "Normal",
+      "family_name": "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-SemiBold.ttf"
+    },
+    {
+      "font_style": "Normal",
+      "font_weight": 700,
+      "font_stretch": "Normal",
+      "family_name": "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-Bold.ttf"
+    },
+    {
+      "font_style": "Normal",
+      "font_weight": 800,
+      "font_stretch": "Normal",
+      "family_name": "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian-ExtraBold.ttf"
+    }
+  ]
+}

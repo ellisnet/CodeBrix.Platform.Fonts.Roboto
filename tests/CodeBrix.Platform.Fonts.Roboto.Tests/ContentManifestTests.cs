@@ -126,9 +126,76 @@ public class ContentManifestTests
         distinctStretches.Should().BeEquivalentTo(new[] { "Condensed", "Normal", "SemiCondensed" });
     }
 
-    private static List<ManifestEntry> ReadManifestEntries()
+    [Theory]
+    [InlineData("NotoSansArmenian")]
+    [InlineData("NotoSansGeorgian")]
+    public void Companion_manifest_has_exactly_6_entries(string family)
     {
-        var json = File.ReadAllText(TestAssetPaths.ManifestPath);
+        //Arrange
+        var entries = ReadManifestEntries(TestAssetPaths.CompanionManifestPath(family));
+
+        //Act/Assert
+        entries.Count.Should().Be(6);
+    }
+
+    [Theory]
+    [InlineData("NotoSansArmenian")]
+    [InlineData("NotoSansGeorgian")]
+    public void Companion_manifest_covers_all_six_weights(string family)
+    {
+        //Arrange
+        var entries = ReadManifestEntries(TestAssetPaths.CompanionManifestPath(family));
+        var expectedWeights = new[] { 300, 400, 500, 600, 700, 800 };
+
+        //Act
+        var distinctWeights = entries.Select(e => e.FontWeight).Distinct().OrderBy(w => w).ToArray();
+
+        //Assert
+        distinctWeights.Should().BeEquivalentTo(expectedWeights);
+    }
+
+    [Theory]
+    [InlineData("NotoSansArmenian")]
+    [InlineData("NotoSansGeorgian")]
+    public void Companion_manifest_is_upright_only(string family)
+    {
+        //Arrange — neither family has an italic face upstream, so italic text in
+        //those scripts renders upright. Asserting it here keeps that a decision
+        //rather than an accident.
+        var entries = ReadManifestEntries(TestAssetPaths.CompanionManifestPath(family));
+
+        //Act
+        var distinctStyles = entries.Select(e => e.FontStyle).Distinct().ToArray();
+
+        //Assert
+        distinctStyles.Should().BeEquivalentTo(new[] { "Normal" });
+    }
+
+    [Theory]
+    [InlineData("NotoSansArmenian")]
+    [InlineData("NotoSansGeorgian")]
+    public void Companion_manifest_every_referenced_font_file_exists_on_disk(string family)
+    {
+        //Arrange
+        var entries = ReadManifestEntries(TestAssetPaths.CompanionManifestPath(family));
+
+        //Act
+        var missing = entries
+            .Select(e => Path.GetFileName(e.FamilyName))
+            .Select(name => Path.Combine(TestAssetPaths.FontsFolder, name))
+            .Where(path => !File.Exists(path))
+            .ToList();
+
+        //Assert
+        missing.Should().BeEmpty();
+    }
+
+    private static List<ManifestEntry> ReadManifestEntries() =>
+        ReadManifestEntries(TestAssetPaths.ManifestPath);
+
+    private static List<ManifestEntry> ReadManifestEntries(string manifestPath)
+    {
+        var json = File.ReadAllText(manifestPath);
         using var doc = JsonDocument.Parse(json);
         var fonts = doc.RootElement.GetProperty("fonts");
 

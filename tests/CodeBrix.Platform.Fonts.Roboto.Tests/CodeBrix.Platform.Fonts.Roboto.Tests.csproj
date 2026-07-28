@@ -24,7 +24,8 @@
 
   <ItemGroup>
     <None Include="..\..\src\CodeBrix.Platform.Fonts.Roboto\Fonts\*.ttf" CopyToOutputDirectory="PreserveNewest" Link="TestAssets\Fonts\%(FileName)%(Extension)" />
-    <None Include="..\..\src\CodeBrix.Platform.Fonts.Roboto\Fonts\Roboto.ttf.manifest" CopyToOutputDirectory="PreserveNewest" Link="TestAssets\Fonts\Roboto.ttf.manifest" />
+    <None Include="..\..\src\CodeBrix.Platform.Fonts.Roboto\Fonts\*.ttf.manifest" CopyToOutputDirectory="PreserveNewest" Link="TestAssets\Fonts\%(FileName)%(Extension)" />
+    <None Include="..\..\CODEBRIX-DEVELOP.json" CopyToOutputDirectory="PreserveNewest" Link="TestAssets\CODEBRIX-DEVELOP.json" />
     <None Include="..\..\src\CodeBrix.Platform.Fonts.Roboto\CodeBrix.Platform.Fonts.Roboto.uprimarker" CopyToOutputDirectory="PreserveNewest" Link="TestAssets\CodeBrix.Platform.Fonts.Roboto.uprimarker" />
     <None Include="..\..\src\CodeBrix.Platform.Fonts.Roboto\buildTransitive\net10.0\CodeBrix.Platform.Fonts.Roboto.OflLicenseForever.targets" CopyToOutputDirectory="PreserveNewest" Link="TestAssets\buildTransitive\net10.0\CodeBrix.Platform.Fonts.Roboto.OflLicenseForever.targets" />
   </ItemGroup>

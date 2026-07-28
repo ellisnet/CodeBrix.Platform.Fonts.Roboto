@@ -56,24 +56,28 @@
     <Product>CodeBrix.Platform.Fonts.Roboto</Product>
     <Title>CodeBrix.Platform.Fonts.Roboto</Title>
     <Authors>Jeremy Ellis</Authors>
-    <Description>A .NET 10 redistribution of the Roboto font family, packaged for the CodeBrix family. Ships the Roboto variable font plus 36 static .ttf files (Light/Regular/Medium/SemiBold/Bold/ExtraBold weights in Normal/Italic styles across Normal/Condensed/SemiCondensed stretches), a font .ttf.manifest JSON, and a buildTransitive .targets file that prunes the unused static font set at consumer-build time. The whole package, code and fonts alike, is distributed under the SIL Open Font License 1.1.</Description>
+    <Description>A .NET 10 redistribution of the Roboto font family, packaged for the CodeBrix family. Ships the Roboto variable font plus 36 static .ttf files (Light/Regular/Medium/SemiBold/Bold/ExtraBold weights in Normal/Italic styles across Normal/Condensed/SemiCondensed stretches), and the Noto Sans Armenian and Noto Sans Georgian companion fonts that extend coverage to the Armenian and Georgian scripts Roboto itself does not carry. Includes a font .ttf.manifest JSON per family and a buildTransitive .targets file that prunes the unused static font set at consumer-build time. The whole package, code and fonts alike, is distributed under the SIL Open Font License 1.1.</Description>
     <PackageLicenseExpression>OFL-1.1</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageIcon>icon-codebrix-128.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Roboto font (c) 2011 The Roboto Project Authors, distributed under SIL OFL 1.1.</Copyright>
+    <Copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Roboto font (c) 2011 The Roboto Project Authors; Noto Sans Armenian and Noto Sans Georgian fonts (c) 2022 The Noto Project Authors; all distributed under SIL OFL 1.1.</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <IsPackable>true</IsPackable>
-    <PackageTags>Roboto;font;fonts;Platform;variable-font;SIL-OFL;CodeBrix</PackageTags>
+    <PackageTags>Roboto;NotoSans;font;fonts;Platform;variable-font;SIL-OFL;CodeBrix</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\icon-codebrix-128.png"     Pack="true" PackagePath="" />
     <None Include="..\..\README.md"                  Pack="true" PackagePath="" />
     <None Include="..\..\AGENT-README.txt"           Pack="true" PackagePath="" />
+    <!-- The font's self-description for CodeBrix.Develop's New Application experience:
+         how to reference this font in a generated application, and which software-keyboard
+         layouts its glyph coverage actually supports. -->
+    <None Include="..\..\CODEBRIX-DEVELOP.json"      Pack="true" PackagePath="" />
     <None Include="..\..\THIRD-PARTY-NOTICES.txt"    Pack="true" PackagePath="" />
     <None Include="..\..\OFL.txt"                    Pack="true" PackagePath="" />
   </ItemGroup>
@@ -85,7 +89,7 @@
     <None Include="Fonts/*.ttf"
           Pack="true"
           PackagePath="lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/" />
-    <None Include="Fonts/Roboto.ttf.manifest"
+    <None Include="Fonts/*.ttf.manifest"
           Pack="true"
           PackagePath="lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/" />
     <None Include="buildTransitive\**\*"

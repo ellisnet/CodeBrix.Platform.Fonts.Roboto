@@ -61,14 +61,18 @@ public class TargetsFileTests
     }
 
     [Fact]
-    public void Targets_file_never_removes_the_variable_font()
+    public void Targets_file_never_removes_a_variable_font()
     {
         //Arrange
         var content = File.ReadAllText(TestAssetPaths.TargetsFilePath);
 
         //Assert
-        // The variable font (Fonts\Roboto.ttf, no dash) must not appear in a
+        // The variable fonts (no dash in the file name) must not appear in a
         // Remove= expression; only the dash-bearing static fonts are pruned.
+        // The two companions matter most here: they carry the Armenian and
+        // Georgian scripts, so pruning them would silently drop coverage.
         content.Should().NotContain("Fonts\\Roboto.ttf\"");
+        content.Should().NotContain("Fonts\\NotoSansArmenian.ttf\"");
+        content.Should().NotContain("Fonts\\NotoSansGeorgian.ttf\"");
     }
 }

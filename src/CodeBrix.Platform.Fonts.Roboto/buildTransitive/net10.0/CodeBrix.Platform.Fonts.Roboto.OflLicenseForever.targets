@@ -11,12 +11,17 @@
       Behaviour:
         * On platforms that do NOT support the font manifest, the static font
           files (their names contain a dash) are removed, leaving only the
-          variable font Roboto.ttf.
-        * The variable font Roboto.ttf is intentionally NEVER removed. Consumers
-          (and the CodeBrix.Platform default-font configuration) reference it by
-          the direct path ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf,
-          so it must stay present on every platform (including manifest-capable
-          ones) for those references to resolve.
+          variable fonts Roboto.ttf, NotoSansArmenian.ttf and
+          NotoSansGeorgian.ttf.
+        * Those three variable fonts are intentionally NEVER removed. Consumers
+          (and the CodeBrix.Platform default-font configuration) reference them
+          by direct paths such as
+          ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf,
+          so they must stay present on every platform (including manifest-capable
+          ones) for those references to resolve. The two companion fonts are
+          named without a dash for exactly this reason: they are the fallback
+          families that supply the Armenian and Georgian scripts Roboto does not
+          carry, and losing them would silently drop those scripts.
     -->
     <Target Name="CodeBrixRemoveUnusedRoboto" AfterTargets="_CodeBrixAddLibraryAssets">
         <ItemGroup>

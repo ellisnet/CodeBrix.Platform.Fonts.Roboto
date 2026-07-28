@@ -16,13 +16,15 @@ public class ContentFilePresenceTests
         => File.Exists(TestAssetPaths.ManifestPath).Should().BeTrue();
 
     [Fact]
-    public void Total_ttf_count_is_37()
+    public void Total_ttf_count_is_51()
     {
         //Arrange/Act
+        // 1 Roboto variable + 36 Roboto statics, then the two companion
+        // families: Noto Sans Armenian (1 + 6) and Noto Sans Georgian (1 + 6).
         var ttfFiles = Directory.GetFiles(TestAssetPaths.FontsFolder, "*.ttf");
 
         //Assert
-        ttfFiles.Length.Should().Be(37);
+        ttfFiles.Length.Should().Be(51);
     }
 
     [Fact]
@@ -49,6 +51,37 @@ public class ContentFilePresenceTests
             where !File.Exists(path)
             select fileName
         ).ToList();
+
+        //Assert
+        missing.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("NotoSansArmenian")]
+    [InlineData("NotoSansGeorgian")]
+    public void Companion_variable_font_is_present(string family)
+        => File.Exists(TestAssetPaths.CompanionFontPath(family)).Should().BeTrue();
+
+    [Theory]
+    [InlineData("NotoSansArmenian")]
+    [InlineData("NotoSansGeorgian")]
+    public void Companion_manifest_is_present(string family)
+        => File.Exists(TestAssetPaths.CompanionManifestPath(family)).Should().BeTrue();
+
+    [Theory]
+    [InlineData("NotoSansArmenian")]
+    [InlineData("NotoSansGeorgian")]
+    public void All_6_static_fonts_are_present_for(string family)
+    {
+        //Arrange — neither family has an italic face upstream, so only the six
+        //upright weights ship.
+        var weights = new[] { "Light", "Regular", "Medium", "SemiBold", "Bold", "ExtraBold" };
+
+        //Act
+        var missing = weights
+            .Select(weight => $"{family}-{weight}.ttf")
+            .Where(fileName => !File.Exists(Path.Combine(TestAssetPaths.FontsFolder, fileName)))
+            .ToList();
 
         //Assert
         missing.Should().BeEmpty();
