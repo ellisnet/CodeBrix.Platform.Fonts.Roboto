@@ -265,9 +265,9 @@ inherited from the standard library scaffold; key points:
     comment. CS1591 is fixed at source, never suppressed. (In this
     library's first iteration there are no public types, so CS1591
     is trivially clean.)
-  * Tests use xUnit v3 + SilverAssertions; coverlet.collector for
-    coverage; `TestContext.Current.CancellationToken` is threaded through
-    any cancellable call inside a test.
+  * Tests use xUnit v3 + SilverAssertions;
+    `TestContext.Current.CancellationToken` is threaded through any
+    cancellable call inside a test.
   * No project-level warning suppression (`<NoWarn>`, `<WarningLevel>0</>`,
     `<TreatWarningsAsErrors>false</>`, etc. are all forbidden).
   * The whole package — wrapper code and bundled fonts alike — is licensed
