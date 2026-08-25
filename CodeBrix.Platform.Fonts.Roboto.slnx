@@ -2,9 +2,12 @@
   <Folder Name="/Solution Items/">
     <File Path="AGENT-README.txt" />
     <File Path="CODEBRIX-DEVELOP.json" />
+    <File Path="EXTRAS-README.txt" />
     <File Path="icon-codebrix-128.png" />
     <File Path="LICENSE" />
+    <File Path="MAINTAINER-README.txt" />
     <File Path="OFL.txt" />
+    <File Path="README-INDEX.txt" />
     <File Path="README.md" />
     <File Path="THIRD-PARTY-NOTICES.txt" />
   </Folder>
