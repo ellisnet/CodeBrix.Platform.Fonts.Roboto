@@ -138,7 +138,48 @@ public class ContentManifestTests
         entries.Count.Should().Be(6);
     }
 
+    [Fact]
+    public void NotoSans_manifest_has_exactly_12_entries()
+    {
+        //Arrange — six weights in both styles, unlike the upright-only
+        //Armenian and Georgian companions.
+        var entries = ReadManifestEntries(TestAssetPaths.CompanionManifestPath("NotoSans"));
+
+        //Act/Assert
+        entries.Count.Should().Be(12);
+    }
+
+    [Fact]
+    public void NotoSans_manifest_covers_normal_and_italic_styles()
+    {
+        //Arrange — upstream publishes a full italic set for Noto Sans, so
+        //italic polytonic Greek is real rather than synthesised. Asserting it
+        //here keeps that a decision rather than an accident.
+        var entries = ReadManifestEntries(TestAssetPaths.CompanionManifestPath("NotoSans"));
+
+        //Act
+        var distinctStyles = entries.Select(e => e.FontStyle).Distinct().OrderBy(s => s).ToArray();
+
+        //Assert
+        distinctStyles.Should().BeEquivalentTo(new[] { "Italic", "Normal" });
+    }
+
+    [Fact]
+    public void NotoSans_manifest_is_normal_stretch_only()
+    {
+        //Arrange — the Condensed/SemiCondensed/ExtraCondensed upstream
+        //stretches are deliberately not bundled.
+        var entries = ReadManifestEntries(TestAssetPaths.CompanionManifestPath("NotoSans"));
+
+        //Act
+        var distinctStretches = entries.Select(e => e.FontStretch).Distinct().ToArray();
+
+        //Assert
+        distinctStretches.Should().BeEquivalentTo(new[] { "Normal" });
+    }
+
     [Theory]
+    [InlineData("NotoSans")]
     [InlineData("NotoSansArmenian")]
     [InlineData("NotoSansGeorgian")]
     public void Companion_manifest_covers_all_six_weights(string family)
@@ -161,7 +202,8 @@ public class ContentManifestTests
     {
         //Arrange — neither family has an italic face upstream, so italic text in
         //those scripts renders upright. Asserting it here keeps that a decision
-        //rather than an accident.
+        //rather than an accident. Noto Sans is excluded on purpose: it DOES
+        //ship italics (see NotoSans_manifest_covers_normal_and_italic_styles).
         var entries = ReadManifestEntries(TestAssetPaths.CompanionManifestPath(family));
 
         //Act
@@ -172,6 +214,7 @@ public class ContentManifestTests
     }
 
     [Theory]
+    [InlineData("NotoSans")]
     [InlineData("NotoSansArmenian")]
     [InlineData("NotoSansGeorgian")]
     public void Companion_manifest_every_referenced_font_file_exists_on_disk(string family)

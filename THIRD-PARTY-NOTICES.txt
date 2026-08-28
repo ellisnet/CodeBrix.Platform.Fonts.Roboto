@@ -2,16 +2,18 @@ THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
 
 CodeBrix.Platform.Fonts.Roboto is a CodeBrix-family redistribution of the
 Roboto font family, packaged as a .NET 10 NuGet library. Roboto covers the
-Latin, Greek and Cyrillic scripts but not Armenian or Georgian, so this
-package additionally bundles two Noto Sans companion families that supply
-those scripts. The package therefore incorporates three pieces of
+Latin and Cyrillic scripts and modern (monotonic) Greek, but not the
+polytonic Greek of the Greek Extended block, and not Armenian or Georgian,
+so this package additionally bundles three Noto Sans companion families that
+supply those scripts. The package therefore incorporates four pieces of
 third-party material:
 
   1. The Roboto font family (SIL OFL 1.1) — the actual `.ttf` font files
      themselves, originally designed by Christian Robertson and maintained
      by the Google Fonts team as the Roboto Project.
-  2. The Noto Sans Armenian font family (SIL OFL 1.1) — the Armenian companion.
-  3. The Noto Sans Georgian font family (SIL OFL 1.1) — the Georgian companion.
+  2. The Noto Sans font family (SIL OFL 1.1) — the polytonic Greek companion.
+  3. The Noto Sans Armenian font family (SIL OFL 1.1) — the Armenian companion.
+  4. The Noto Sans Georgian font family (SIL OFL 1.1) — the Georgian companion.
 
 The CodeBrix-authored parts of this package — the `.csproj`, the
 buildTransitive `.targets` file, the `.ttf.manifest` JSON files, the
@@ -100,7 +102,60 @@ inside the produced NuGet under the same name.
 
 ================================================================================
 
-2. Noto Sans Armenian Font Family (Armenian companion)
+2. Noto Sans Font Family (polytonic Greek companion)
+   -------------------------------------------------
+   Project URL:    https://github.com/notofonts/latin-greek-cyrillic
+   Copyright:      Copyright 2022 The Noto Project Authors
+                   (https://github.com/notofonts/latin-greek-cyrillic)
+   License:        SIL Open Font License, Version 1.1
+
+   Note on naming: the Noto Sans copyright statement declares NO Reserved Font
+   Name, so SIL OFL 1.1 condition 3 does not apply to this family. The `.ttf`
+   files are redistributed bit-for-bit unmodified.
+
+   Why it is bundled: Roboto carries only modern, monotonic Greek. It covers 75
+   code points of the Greek and Coptic block (U+0370-U+03FF) and just one code
+   point of the Greek Extended block (U+1F00-U+1FFF), and it does not carry the
+   combining marks polytonic Greek would otherwise be composed from (no U+0313
+   psili, U+0314 dasia, U+0342 perispomeni or U+0345 ypogegrammeni). Ancient
+   polytonic Greek therefore cannot be rendered from Roboto at all. Noto Sans
+   supplies the complete Greek Extended block — all 233 assigned code points —
+   plus 121 code points of Greek and Coptic, in a sans design consistent with
+   Roboto.
+
+   Files redistributed from this upstream project (binary `.ttf` files):
+
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-Bold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-BoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-ExtraBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-ExtraBoldItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-Italic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-Light.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-LightItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-Medium.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-MediumItalic.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-Regular.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-SemiBold.ttf
+     - src/CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans-SemiBoldItalic.ttf
+
+   Modifications made during redistribution:
+     - Only the six weights Light (300) through ExtraBold (800) are shipped as
+       static instances, in the Normal stretch, upright and italic. The upstream
+       Thin (100), ExtraLight (200) and Black (900) static instances, and the
+       Condensed, SemiCondensed and ExtraCondensed stretches, are not included.
+       (Those weights and widths remain reachable through the bundled variable
+       font, which carries both the `wght` and `wdth` axes.)
+     - The upstream upright variable font `NotoSans-VariableFont_wdth,wght.ttf`
+       was renamed to `NotoSans.ttf`. No `.ttf` binary content was altered.
+     - The separate upstream italic variable font
+       `NotoSans-Italic-VariableFont_wdth,wght.ttf` is not included; italic
+       styles are provided through the static instances, matching how Roboto
+       itself is packaged here.
+
+================================================================================
+
+3. Noto Sans Armenian Font Family (Armenian companion)
    ---------------------------------------------------
    Project URL:    https://github.com/notofonts/armenian
    Copyright:      Copyright 2022 The Noto Project Authors
@@ -133,7 +188,7 @@ inside the produced NuGet under the same name.
 
 ================================================================================
 
-3. Noto Sans Georgian Font Family (Georgian companion)
+4. Noto Sans Georgian Font Family (Georgian companion)
    ---------------------------------------------------
    Project URL:    https://github.com/notofonts/georgian
    Copyright:      Copyright 2022 The Noto Project Authors
@@ -174,7 +229,7 @@ The combined work is published under the SPDX expression `OFL-1.1`. SIL OFL
 and redistributed alongside any other software (condition 2). The
 CodeBrix-authored wrapper, build logic, and packaging metadata are released
 under the same SIL OFL 1.1 as the bundled font files, as are the bundled
-Noto Sans companion fonts.
+Noto Sans, Noto Sans Armenian and Noto Sans Georgian companion fonts.
 
 Jeremy Ellis and contributors license the CodeBrix.Platform.Fonts.Roboto
 project to you under the terms set forth in the LICENSE / OFL.txt file (SIL

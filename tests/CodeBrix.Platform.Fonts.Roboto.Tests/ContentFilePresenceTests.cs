@@ -16,15 +16,16 @@ public class ContentFilePresenceTests
         => File.Exists(TestAssetPaths.ManifestPath).Should().BeTrue();
 
     [Fact]
-    public void Total_ttf_count_is_51()
+    public void Total_ttf_count_is_64()
     {
         //Arrange/Act
-        // 1 Roboto variable + 36 Roboto statics, then the two companion
-        // families: Noto Sans Armenian (1 + 6) and Noto Sans Georgian (1 + 6).
+        // 1 Roboto variable + 36 Roboto statics, then the three companion
+        // families: Noto Sans (1 + 12), Noto Sans Armenian (1 + 6) and
+        // Noto Sans Georgian (1 + 6).
         var ttfFiles = Directory.GetFiles(TestAssetPaths.FontsFolder, "*.ttf");
 
         //Assert
-        ttfFiles.Length.Should().Be(51);
+        ttfFiles.Length.Should().Be(64);
     }
 
     [Fact]
@@ -57,16 +58,40 @@ public class ContentFilePresenceTests
     }
 
     [Theory]
+    [InlineData("NotoSans")]
     [InlineData("NotoSansArmenian")]
     [InlineData("NotoSansGeorgian")]
     public void Companion_variable_font_is_present(string family)
         => File.Exists(TestAssetPaths.CompanionFontPath(family)).Should().BeTrue();
 
     [Theory]
+    [InlineData("NotoSans")]
     [InlineData("NotoSansArmenian")]
     [InlineData("NotoSansGeorgian")]
     public void Companion_manifest_is_present(string family)
         => File.Exists(TestAssetPaths.CompanionManifestPath(family)).Should().BeTrue();
+
+    [Fact]
+    public void All_12_static_NotoSans_fonts_are_present()
+    {
+        //Arrange — Noto Sans supplies polytonic Greek, and unlike the Armenian
+        //and Georgian companions it ships upright AND italic upstream.
+        var weights = new[] { "Light", "Regular", "Medium", "SemiBold", "Bold", "ExtraBold" };
+        var styles = new[] { "", "Italic" };
+
+        //Act
+        var missing = (
+            from weight in weights
+            from style in styles
+            let weightSegment = (weight == "Regular" && style == "Italic") ? "" : weight
+            let fileName = $"NotoSans-{weightSegment}{style}.ttf"
+            where !File.Exists(Path.Combine(TestAssetPaths.FontsFolder, fileName))
+            select fileName
+        ).ToList();
+
+        //Assert
+        missing.Should().BeEmpty();
+    }
 
     [Theory]
     [InlineData("NotoSansArmenian")]
@@ -85,6 +110,22 @@ public class ContentFilePresenceTests
 
         //Assert
         missing.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void No_NotoSans_static_collides_with_a_companion_family_name()
+    {
+        //Arrange — "NotoSans-*" is a prefix of "NotoSansArmenian"/"NotoSansGeorgian"
+        //only if a dash is forgotten, so this pins that the three families stay
+        //distinct on disk and that the manifest-per-family discovery used by
+        //consumers (e.g. Html2Pdf) cannot mis-group them.
+        var notoSansStatics = Directory.GetFiles(TestAssetPaths.FontsFolder, "NotoSans-*.ttf")
+            .Select(Path.GetFileNameWithoutExtension)
+            .ToList();
+
+        //Assert
+        notoSansStatics.Count.Should().Be(12);
+        notoSansStatics.Where(n => n!.Contains("Armenian") || n.Contains("Georgian")).Should().BeEmpty();
     }
 
     [Fact]

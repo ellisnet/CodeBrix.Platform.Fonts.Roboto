@@ -2,7 +2,7 @@
 
 A redistribution of the Roboto font family packaged as a CodeBrix-family NuGet library for .NET 10 applications.
 CodeBrix.Platform.Fonts.Roboto is a content-files font package for CodeBrix.Platform-forked applications — supplying the Roboto variable font and its static instances as build-time assets — and is equally usable as a plain content-files NuGet in any .NET 10 project that wants the Roboto font set.
-Roboto covers the Latin, Greek and Cyrillic scripts but not Armenian or Georgian, so this package also bundles two Noto Sans companion families that supply those scripts in a matching sans design.
+Roboto covers the Latin and Cyrillic scripts and modern (monotonic) Greek, but not the polytonic Greek of the Greek Extended block, and not Armenian or Georgian, so this package also bundles three Noto Sans companion families that supply those scripts in a matching sans design.
 The library has no managed dependencies other than .NET, and is provided as a .NET 10 library and associated `CodeBrix.Platform.Fonts.Roboto.OflLicenseForever` NuGet package.
 
 CodeBrix.Platform.Fonts.Roboto supports applications and assemblies that target Microsoft .NET version 10.0 and later.
@@ -13,12 +13,13 @@ Please update your C#/.NET code and projects to the latest LTS version of Micros
 
 * The Roboto variable font (`Roboto.ttf`) covering the full weight axis (100-900) and width axis, used directly on every platform.
 * 36 static `.ttf` font files covering the Light/Regular/Medium/SemiBold/Bold/ExtraBold weights in Normal, Italic, Condensed, Condensed-Italic, SemiCondensed, and SemiCondensed-Italic stretches — for platforms that resolve fonts through the static-instance manifest.
-* Two companion font families that extend script coverage beyond what Roboto itself carries:
+* Three companion font families that extend script coverage beyond what Roboto itself carries:
+  * **Noto Sans** (`NotoSans.ttf` plus 12 static instances, upright and italic) — polytonic (ancient) Greek. Roboto carries only monotonic Greek: 75 code points of Greek and Coptic and a single code point of the Greek Extended block, with none of the combining marks polytonic would otherwise be composed from. Noto Sans supplies all 233 assigned Greek Extended code points.
   * **Noto Sans Armenian** (`NotoSansArmenian.ttf` plus 6 static instances) — the Armenian script.
   * **Noto Sans Georgian** (`NotoSansGeorgian.ttf` plus 6 static instances) — the Georgian script.
 * A `.ttf.manifest` JSON file per family that maps `font_style` / `font_weight` / `font_stretch` triples to the matching static font file.
 * A `CODEBRIX-DEVELOP.json` descriptor that tells CodeBrix.Develop how to wire this font into a generated application and which software-keyboard layouts the package's glyph coverage supports.
-* A `buildTransitive` MSBuild `.targets` file (hooking into the CodeBrix.Platform `_CodeBrixAddLibraryAssets` target) that prunes the redundant static font files at build time on platforms that don't need them, while always keeping the three variable fonts available.
+* A `buildTransitive` MSBuild `.targets` file (hooking into the CodeBrix.Platform `_CodeBrixAddLibraryAssets` target) that prunes the redundant static font files at build time on platforms that don't need them, while always keeping the four variable fonts available.
 * The CodeBrix `.uprimarker` file so CodeBrix.Platform build pipelines discover the package as a UPRI-bearing font asset library.
 
 ## Sample Code
@@ -37,6 +38,15 @@ Please update your C#/.NET code and projects to the latest LTS version of Micros
            FontFamily="ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Bold.ttf" />
 ```
 
+### Render polytonic (ancient) Greek
+
+Roboto has no polytonic glyphs, so ancient Greek must be set in the Noto Sans companion:
+
+```xml
+<TextBlock Text="μῆνιν ἄειδε θεὰ Πηληϊάδεω Ἀχιλῆος"
+           FontFamily="ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans.ttf" />
+```
+
 ### Set Roboto as the default text font (CodeBrix.Platform app)
 
 ```csharp
@@ -52,4 +62,4 @@ The entire package — the library code, the `.targets` file, the packaging wrap
 
 The full license text is bundled with this repository as `OFL.txt` at the repository root and is also packaged inside the produced NuGet under the same name. The package is published under the SPDX expression `OFL-1.1`.
 
-See `THIRD-PARTY-NOTICES.txt` for the full attribution of all three bundled font families.
+See `THIRD-PARTY-NOTICES.txt` for the full attribution of all four bundled font families.

@@ -77,15 +77,29 @@ public class DescriptorTests
         => FallbackUris().Where(uri => uri.Contains('#')).Should().BeEmpty();
 
     [Fact]
-    public void Fallback_fonts_are_the_two_companion_families()
+    public void Fallback_fonts_are_the_three_companion_families()
     {
-        //Arrange — Armenian and Georgian are exactly the scripts Roboto itself
-        //does not carry. Roboto already covers Greek, so there is no Greek
-        //companion here (unlike the sibling Merriweather package).
+        //Arrange — polytonic Greek, Armenian and Georgian are exactly the
+        //scripts Roboto itself does not carry. Roboto covers only MONOTONIC
+        //Greek, so Noto Sans is here for the Greek Extended block — the same
+        //role Noto Serif plays in the sibling Merriweather package.
         var names = FallbackUris().Select(Path.GetFileNameWithoutExtension).OrderBy(n => n).ToArray();
 
         //Assert
-        names.Should().BeEquivalentTo(new[] { "NotoSansArmenian", "NotoSansGeorgian" });
+        names.Should().BeEquivalentTo(new[] { "NotoSans", "NotoSansArmenian", "NotoSansGeorgian" });
+    }
+
+    [Fact]
+    public void NotoSans_is_the_first_fallback()
+    {
+        //Arrange — Noto Sans is the widest companion, and it carries no
+        //Armenian and only one Georgian code point, so it can lead the chain
+        //without shadowing the two script-specific companions. Order is part of
+        //the descriptor contract: the platform consults the list in order.
+        var names = FallbackUris().Select(Path.GetFileNameWithoutExtension).ToArray();
+
+        //Assert
+        names[0].Should().Be("NotoSans");
     }
 
     [Fact]
@@ -113,7 +127,9 @@ public class DescriptorTests
     [Fact]
     public void Keyboard_layouts_include_greek_from_roboto_itself()
     {
-        //Arrange — Roboto carries Greek natively; this is not companion-supplied.
+        //Arrange — Roboto carries MONOTONIC Greek natively, which is what the
+        //"el" layout needs; this is not companion-supplied. (Polytonic Greek
+        //comes from the Noto Sans companion and has no layout id of its own.)
         var layouts = KeyboardLayouts();
 
         //Assert

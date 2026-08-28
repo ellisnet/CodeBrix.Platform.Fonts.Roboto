@@ -69,9 +69,11 @@ public class TargetsFileTests
         //Assert
         // The variable fonts (no dash in the file name) must not appear in a
         // Remove= expression; only the dash-bearing static fonts are pruned.
-        // The two companions matter most here: they carry the Armenian and
-        // Georgian scripts, so pruning them would silently drop coverage.
+        // The three companions matter most here: they carry the polytonic
+        // Greek, Armenian and Georgian scripts, so pruning them would silently
+        // drop coverage.
         content.Should().NotContain("Fonts\\Roboto.ttf\"");
+        content.Should().NotContain("Fonts\\NotoSans.ttf\"");
         content.Should().NotContain("Fonts\\NotoSansArmenian.ttf\"");
         content.Should().NotContain("Fonts\\NotoSansGeorgian.ttf\"");
     }

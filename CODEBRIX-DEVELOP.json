@@ -5,6 +5,7 @@
   "fontFamilyUri": "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf",
   "resourceKey": "RobotoFont",
   "fallbackFontUris": [
+    "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans.ttf",
     "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian.ttf",
     "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian.ttf"
   ],

@@ -18,23 +18,23 @@ This repository produces exactly one NuGet package:
   Covered by  AGENT-README.txt (repository root)
 
 The package is a font asset carrier. It has no managed code beyond an
-assembly-level `InternalsVisibleTo` attribute; the deliverable is three font
-families' `.ttf` sets, three static-instance manifests, a CodeBrix.Develop
+assembly-level `InternalsVisibleTo` attribute; the deliverable is four font
+families' `.ttf` sets, four static-instance manifests, a CodeBrix.Develop
 descriptor, a `.uprimarker` marker and a buildTransitive MSBuild `.targets`
 file. The assembly exists only so the content files get a stable,
 assembly-named folder that `ms-appx:///` URIs can resolve against.
 
 The structural fact that makes this repository different from its OpenSans
-sibling: it ships COMPANION families. Roboto covers Latin, Greek and Cyrillic
-but not Armenian or Georgian, so Noto Sans Armenian and Noto Sans Georgian are
-bundled to supply those scripts. Three families means three manifests, three
-variable fonts that must survive pruning, and a `fallbackFontUris` array in
-the descriptor. Almost every non-obvious rule below follows from that.
+sibling: it ships COMPANION families. Roboto covers Latin, Cyrillic and modern
+monotonic Greek, but not polytonic (ancient) Greek, Armenian or Georgian, so
+Noto Sans, Noto Sans Armenian and Noto Sans Georgian are bundled to supply
+those scripts. Four families means four manifests, four variable fonts that
+must survive pruning, and a `fallbackFontUris` array in the descriptor. Almost every non-obvious rule below follows from that.
 
 Consequence worth internalising before editing anything: the assembly name,
 the root namespace, the packed content-folder path, the `.uprimarker`
-filename, every `family_name` URI in all three manifests, the `fontFamilyUri`
-and both `fallbackFontUris` in CODEBRIX-DEVELOP.json, and the paths inside the
+filename, every `family_name` URI in all four manifests, the `fontFamilyUri`
+and all three `fallbackFontUris` in CODEBRIX-DEVELOP.json, and the paths inside the
 `.targets` file all encode the string `CodeBrix.Platform.Fonts.Roboto`.
 Renaming the assembly means renaming all of them in lockstep, and the test
 suite is written to catch a partial rename.
@@ -74,6 +74,7 @@ REPOSITORY LAYOUT
         Roboto-<Weight>[Italic].ttf                  12 statics
         Roboto_Condensed-<Weight>[Italic].ttf        12 statics
         Roboto_SemiCondensed-<Weight>[Italic].ttf    12 statics
+        NotoSans.ttf / .ttf.manifest                 + 12 statics
         NotoSansArmenian.ttf / .ttf.manifest         + 6 statics
         NotoSansGeorgian.ttf / .ttf.manifest         + 6 statics
 
@@ -133,26 +134,26 @@ What the suite pins:
                            `CodeBrix.Platform.Fonts.Roboto`; the assembly
                            exports no public types — this is what keeps the
                            package API-free; the `.uprimarker` sibling exists.
-  ContentFilePresenceTests the 51-file inventory (48 statics + 3 variable
+  ContentFilePresenceTests the 64-file inventory (60 statics + 4 variable
                            fonts) and the exact static filename grammar,
                            including the Regular-italic quirk where the
                            weight word is dropped.
-  ContentManifestTests     all three manifests parse; entry counts 36 / 6 / 6;
-                           the six weights are covered; every `family_name`
-                           starts with
+  ContentManifestTests     all four manifests parse; entry counts
+                           36 / 12 / 6 / 6; the six weights are covered;
+                           every `family_name` starts with
                            `ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/`
-                           and points at a file that exists on disk; and the
-                           two companion manifests are UPRIGHT-ONLY — that
-                           assertion is what keeps the missing companion
-                           italics a recorded decision rather than an
-                           accident.
+                           and points at a file that exists on disk; the Noto
+                           Sans manifest carries BOTH styles; and the Armenian
+                           and Georgian manifests are UPRIGHT-ONLY — that
+                           assertion is what keeps their missing italics a
+                           recorded decision rather than an accident.
   DescriptorTests          CODEBRIX-DEVELOP.json: schemaVersion 1; packageId
                            equals the published PackageId; displayName
                            "Roboto"; resourceKey "RobotoFont"; the
                            `fontFamilyUri` and every `fallbackFontUri` carry
                            no `#` fragment and point at fonts this package
                            actually ships; the fallback list is exactly
-                           {NotoSansArmenian, NotoSansGeorgian};
+                           {NotoSans, NotoSansArmenian, NotoSansGeorgian};
                            `keyboardLayouts` has no duplicates and contains
                            `ka`, `hy` (companion-supplied) and `el` (native
                            to Roboto).
@@ -163,9 +164,10 @@ What the suite pins:
                            paths; carries the `$(SupportsFontManifest)`
                            condition; contains no foreign family token; and
                            never names `Fonts\Roboto.ttf"`,
+                           `Fonts\NotoSans.ttf"`,
                            `Fonts\NotoSansArmenian.ttf"` or
                            `Fonts\NotoSansGeorgian.ttf"` in a Remove
-                           expression, so none of the three variable fonts
+                           expression, so none of the four variable fonts
                            can ever be pruned.
 
 
@@ -196,8 +198,8 @@ What ships in the nupkg:
   buildTransitive/net10.0/CodeBrix.Platform.Fonts.Roboto.OflLicenseForever.targets
   lib/net10.0/CodeBrix.Platform.Fonts.Roboto.dll
   lib/net10.0/CodeBrix.Platform.Fonts.Roboto.uprimarker
-  lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/*.ttf           (51)
-  lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/*.ttf.manifest  (3)
+  lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/*.ttf           (64)
+  lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/*.ttf.manifest  (4)
   AGENT-README.txt          <- the consumer documentation that ships
   CODEBRIX-DEVELOP.json
   README.md
@@ -214,7 +216,7 @@ Packing quirks to keep in mind:
 
   * Both `Fonts/*.ttf` and `Fonts/*.ttf.manifest` are wildcards here, so a new
     font or manifest dropped into the folder is packed automatically — and
-    will then break the 51-file / 3-manifest tests until the expected counts
+    will then break the 64-file / 4-manifest tests until the expected counts
     are updated deliberately. (The sibling OpenSans repository names its
     single manifest explicitly instead; do not copy that pattern back here.)
   * The `.targets` file's on-disk NAME must stay equal to the PackageId, or
@@ -233,7 +235,7 @@ PROVENANCE AND VENDORED SOURCES
 ===============================
 
 This package is NOT a port of any upstream packaging project. The `.csproj`,
-the buildTransitive `.targets` file, the three `.ttf.manifest` JSON files, the
+the buildTransitive `.targets` file, the four `.ttf.manifest` JSON files, the
 `CODEBRIX-DEVELOP.json` descriptor, the `.uprimarker` marker, the
 documentation and the packaging metadata are original CodeBrix-family files
 and contain no third-party source code.
@@ -250,18 +252,27 @@ and enumerates every file; the short version:
    italic variable font is not included either. Roboto declares NO Reserved
    Font Name, so OFL condition 3 does not restrict the display name.
 
-2. Noto Sans Armenian (the Noto Project) — the Armenian companion, bundled
+2. Noto Sans (the Noto Project, notofonts/latin-greek-cyrillic) — the
+   polytonic Greek companion, bundled because Roboto carries only modern
+   monotonic Greek: 75 codepoints of Greek and Coptic, exactly ONE of Greek
+   Extended, and none of the four polytonic combining marks. Upstream variable
+   font renamed to `NotoSans.ttf`. Six weights as statics in BOTH styles (12
+   files) — upstream does publish italics for this family, unlike the other
+   two companions. The separate upstream italic variable font is not included.
+   No Reserved Font Name.
+
+3. Noto Sans Armenian (the Noto Project) — the Armenian companion, bundled
    because Roboto has no Armenian coverage. Upstream variable font renamed to
    `NotoSansArmenian.ttf`. Six upright weights as statics; upstream publishes
    no italic face. No Reserved Font Name.
 
-3. Noto Sans Georgian (the Noto Project) — the Georgian companion, same shape
+4. Noto Sans Georgian (the Noto Project) — the Georgian companion, same shape
    and same reasoning. Upstream variable font renamed to
    `NotoSansGeorgian.ttf`. No Reserved Font Name.
 
 The variable-font renames are the load-bearing detail: the prune target keys
 off a DASH in the filename, so a variable font must be named without one to
-survive on non-manifest heads. That is why all three are `<Family>.ttf`.
+survive on non-manifest heads. That is why all four are `<Family>.ttf`.
 
 Generated data: the `keyboardLayouts` array in CODEBRIX-DEVELOP.json is
 GENERATED, not hand-written. It is computed by intersecting each
@@ -272,7 +283,10 @@ companions. Nothing in this repository's build performs that computation —
 the array is produced by a developer-run tool and checked in as data.
 Regenerate it whenever the platform's layout set changes or this package's
 font set changes. It currently declares all 38 platform layouts; `ka` and
-`hy` are there only because the companions supply them.
+`hy` are there only because the companions supply them. Adding Noto Sans did
+NOT change the array: it widens coverage into polytonic Greek, which has no
+layout id of its own in the platform's set, and every Latin/Greek/Cyrillic
+layout was already claimed.
 
 Verified font facts, for anyone regenerating or auditing (all derived from
 the shipped binaries):
@@ -281,6 +295,17 @@ the shipped binaries):
                           wdth 75..100 (default 100); NO italic/slant axis;
                           18 named instances; 927 mapped codepoints, matched
                           by every static instance.
+  NotoSans.ttf            axes wght 100..900 (default 400),
+                          wdth 62.5..100 (default 100); NO italic/slant axis;
+                          9 named instances; 3094 mapped codepoints (3091 in
+                          the italics — they lack U+10FB, U+20C0, U+2183),
+                          including the COMPLETE Greek Extended block (233 of
+                          233 assigned codepoints), 121 of Greek and Coptic,
+                          all 112 Combining Diacritical Marks, and the full
+                          256-codepoint Cyrillic block. No Armenian; one
+                          Georgian codepoint (U+10FB), which is why it sits
+                          FIRST in `fallbackFontUris` without shadowing the
+                          two script companions.
   NotoSansArmenian.ttf    axes wght 100..900, wdth 62.5..100; 9 named
                           instances; 430 mapped codepoints, including 91 of
                           the 96 Armenian block and the 5 Armenian ligatures
@@ -290,7 +315,7 @@ the shipped binaries):
                           Mkhedruli (48/48), Asomtavruli (40/48), Nuskhuri
                           (40/48) and Mtavruli (46/48); no Cyrillic, no Greek.
 
-  `.notdef` (glyph 0) is a DRAWN glyph in all three families, so unsupported
+  `.notdef` (glyph 0) is a DRAWN glyph in all four families, so unsupported
   codepoints render as visible tofu boxes. The OpenSans sibling is the
   opposite (empty `.notdef`, invisible gaps) — do not generalise coverage
   behaviour between the two packages.
@@ -324,9 +349,9 @@ from the standard library scaffold; the ones that matter here:
     code and bundled fonts alike.
   * The csproj `<Copyright>` value is, verbatim:
         Copyright (c) 2026 Jeremy Ellis and contributors. Roboto font (c)
-        2011 The Roboto Project Authors; Noto Sans Armenian and Noto Sans
-        Georgian fonts (c) 2022 The Noto Project Authors; all distributed
-        under SIL OFL 1.1.
+        2011 The Roboto Project Authors; Noto Sans, Noto Sans Armenian and
+        Noto Sans Georgian fonts (c) 2022 The Noto Project Authors; all
+        distributed under SIL OFL 1.1.
     The standard CodeBrix copyright line comes first, the upstream font
     attributions second.
 
@@ -341,9 +366,9 @@ NOTES
     filename. That is the entire rule. Any future font whose filename
     contains a dash will be pruned on non-manifest heads, and any font that
     must survive pruning must be named without one. For the companions this
-    is not a nicety: they are the only source of Armenian and Georgian in the
-    package, so pruning them would silently drop two whole scripts rather
-    than merely degrade weights.
+    is not a nicety: they are the only source of polytonic Greek, Armenian
+    and Georgian in the package, so pruning them would silently drop three
+    whole scripts rather than merely degrade weights.
   * `SupportsFontManifest` is set by the CodeBrix.Platform head being built,
     not by this package and not by consumers.
   * `_CodeBrixAddLibraryAssets` is an internal CodeBrix.Platform MSBuild
@@ -351,9 +376,10 @@ NOTES
     repository's `.targets` file and TargetsFileTests must be updated in
     lockstep — otherwise the prune stops firing silently, with no build
     error and no failing test in a consumer's build.
-  * None of the three variable fonts has an italic axis. Any future decision
+  * None of the four variable fonts has an italic axis. Any future decision
     to prune statics more aggressively would remove the only source of italic
-    Roboto in this package, and the companions have no italics at all.
+    Roboto AND of italic Noto Sans (polytonic Greek) in this package; the
+    Armenian and Georgian companions have no italics at all.
   * `keyboardLayouts` claiming `ka` and `hy` depends on the platform actually
     consulting `fallbackFontUris` for codepoints the primary font lacks. The
     descriptor was published deliberately ahead of that platform work, with

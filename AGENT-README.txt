@@ -16,10 +16,11 @@ NuGet in any .NET 10 project that wants the Roboto font set.
 
 Target framework: .NET 10 or later.
 
-Roboto covers the Latin, Greek and Cyrillic scripts but NOT Armenian or
-Georgian. This package therefore also bundles two Noto Sans COMPANION
-families that supply those scripts in a matching sans design. The companions
-ship INSIDE this package — they are not separate NuGet packages, and a
+Roboto covers the Latin and Cyrillic scripts and modern, MONOTONIC Greek,
+but NOT the polytonic (ancient) Greek of the Greek Extended block, and NOT
+Armenian or Georgian. This package therefore also bundles three Noto Sans
+COMPANION families that supply those scripts in a matching sans design. The
+companions ship INSIDE this package — they are not separate NuGet packages, and a
 consumer does not reference anything extra to get them. That is the one
 structural difference from the sibling CodeBrix.Platform.Fonts.OpenSans
 package, and it is the thing to understand first.
@@ -28,14 +29,15 @@ The package has effectively no managed code. Its assembly is a metadata-only
 DLL whose sole purpose is to host the bundled font content files and to give
 those files a stable content-folder name. Everything a consumer uses is data:
 
-  - 51 `.ttf` font files (3 variable + 48 static) laid out under
+  - 64 `.ttf` font files (4 variable + 60 static) laid out under
     lib/net10.0/CodeBrix.Platform.Fonts.Roboto/Fonts/ inside the nupkg.
-  - Three `.ttf.manifest` JSON documents, one per family, mapping
+  - Four `.ttf.manifest` JSON documents, one per family, mapping
     font_style / font_weight / font_stretch triples to the matching static
     font file, so a platform that cannot render variable fonts can still
     honour a weight/style/stretch request.
   - `CODEBRIX-DEVELOP.json` at the package root — the font's own description
-    of how to wire it into an application, including the two companion URIs.
+    of how to wire it into an application, including the three companion
+    URIs.
   - A `.uprimarker` marker file that CodeBrix.Platform build pipelines use to
     discover font asset packages.
   - An MSBuild `.targets` file under buildTransitive/net10.0/ that prunes the
@@ -44,8 +46,8 @@ those files a stable content-folder name. Everything a consumer uses is data:
 Provenance (one line): this package is not a port of any upstream packaging
 project — the `.csproj`, `.targets`, manifests, descriptor and marker are
 original CodeBrix-family files, and the only third-party material is the
-Roboto, Noto Sans Armenian and Noto Sans Georgian `.ttf` binaries,
-redistributed bit-for-bit unmodified.
+Roboto, Noto Sans, Noto Sans Armenian and Noto Sans Georgian `.ttf`
+binaries, redistributed bit-for-bit unmodified.
 
 
 INSTALLATION
@@ -64,8 +66,8 @@ package sets PackageRequireLicenseAcceptance, so a restore in an interactive
 tool will prompt for license acceptance.
 
 NuGet dependencies: none. The package has no PackageReference of its own, and
-the Armenian and Georgian companion faces are files in THIS package — there
-is no companion package to add.
+the polytonic Greek, Armenian and Georgian companion faces are files in THIS
+package — there is no companion package to add.
 
 Requirements and limits:
   - .NET 10.0 or later. There is no multi-targeting and no netstandard asset.
@@ -83,7 +85,7 @@ filename.
 
 See also: the sibling packages
 `CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever` (no companions, so no
-Armenian or Georgian) and `CodeBrix.Platform.Fonts.RobotoMono.OflLicenseForever`
+polytonic Greek, Armenian or Georgian) and `CodeBrix.Platform.Fonts.RobotoMono.OflLicenseForever`
 (the monospace counterpart).
 
 
@@ -104,6 +106,7 @@ Examples:
     ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf
     ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto-Bold.ttf
     ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto_Condensed-Regular.ttf
+    ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans.ttf
     ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian.ttf
     ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian.ttf
 
@@ -144,6 +147,7 @@ Each family has its own manifest, discovered by name (font file path +
 ".manifest"), sitting beside its variable font in the same Fonts folder:
 
     Roboto.ttf.manifest            36 entries
+    NotoSans.ttf.manifest          12 entries
     NotoSansArmenian.ttf.manifest   6 entries
     NotoSansGeorgian.ttf.manifest   6 entries
 
@@ -170,10 +174,15 @@ want to pin one exactly.
 Roboto's manifest is complete and rectangular:
 2 styles x 6 weights x 3 stretches = 36 entries, one per static `.ttf`.
 
-The two companion manifests are 6 entries each: six weights, `font_style`
-"Normal" only, `font_stretch` "Normal" only. There is no italic and no
-condensed companion face, because upstream publishes none. `FontStyle="Italic"`
-on Armenian or Georgian text has no italic entry to resolve to.
+The Noto Sans manifest is 12 entries: six weights x two styles, `font_stretch`
+"Normal" only. Upstream does publish italic Noto Sans, so polytonic Greek
+honours `FontStyle="Italic"`.
+
+The Armenian and Georgian manifests are 6 entries each: six weights,
+`font_style` "Normal" only, `font_stretch` "Normal" only. There is no italic
+and no condensed face for either, because upstream publishes none.
+`FontStyle="Italic"` on Armenian or Georgian text has no italic entry to
+resolve to.
 
 3. The build-time `.targets` file
 ---------------------------------
@@ -185,18 +194,19 @@ filename matches the PackageId, per NU5129). It declares one target:
             AfterTargets="_CodeBrixAddLibraryAssets">
 
 Behaviour: when the MSBuild property `SupportsFontManifest` is not `'true'`,
-the target removes every dash-bearing font filename — that is, all 48 static
-instances across the three families — from the asset item list, leaving only
-`Roboto.ttf`, `NotoSansArmenian.ttf` and `NotoSansGeorgian.ttf` in the
-application output. When `SupportsFontManifest` is `'true'`, nothing is
-removed and all 51 files ship.
+the target removes every dash-bearing font filename — that is, all 60 static
+instances across the four families — from the asset item list, leaving only
+`Roboto.ttf`, `NotoSans.ttf`, `NotoSansArmenian.ttf` and
+`NotoSansGeorgian.ttf` in the application output. When `SupportsFontManifest`
+is `'true'`, nothing is removed and all 64 files ship.
 
-Those three variable fonts are never removed on any platform, so a direct
+Those four variable fonts are never removed on any platform, so a direct
 `ms-appx:///.../Roboto.ttf` (or companion) reference always resolves. The
-prune keys off the dash in the filename; that is why all three variable fonts
+prune keys off the dash in the filename; that is why all four variable fonts
 are named without one. For the companions this matters more than for Roboto:
-they are the only source of Armenian and Georgian in the package, so pruning
-them would silently drop two scripts rather than merely degrade weights.
+they are the only source of polytonic Greek, Armenian and Georgian in the
+package, so pruning them would silently drop three scripts rather than merely
+degrade weights.
 
 Consumers do not set `SupportsFontManifest` themselves — the CodeBrix.Platform
 head being built sets it. Treat it as an input you read, not one you write.
@@ -218,11 +228,14 @@ package:
                     — the primary font. No `#` fragment.
   resourceKey       "RobotoFont" — the App.xaml resource key a generated
                     application declares and binds to.
-  fallbackFontUris  Ordered list of exactly two URIs:
+  fallbackFontUris  Ordered list of exactly three URIs:
+                      ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans.ttf
                       ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian.ttf
                       ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian.ttf
                     They are consulted, in order, for codepoints the primary
-                    font lacks.
+                    font lacks. Noto Sans is first because it is the widest of
+                    the three; it carries no Armenian and only one Georgian
+                    codepoint, so it never shadows the two script companions.
   keyboardLayouts   All 38 software-keyboard layout ids (listed in QUICK
                     REFERENCE CARD), as the UNION across the primary font and
                     its companions — the companions are what add `ka` and
@@ -232,21 +245,21 @@ package:
 
 WHAT A CONSUMER MUST DO ABOUT `fallbackFontUris`: nothing. There is no extra
 package to reference, no MSBuild property to set and no registration call.
-The two companion fonts are files in this same package; referencing this
+The three companion fonts are files in this same package; referencing this
 package deploys them, and the `.targets` prune is written specifically so
 they survive on every head. The descriptor exists so CodeBrix.Develop and the
 platform can read the fallback chain; it is not a consumer to-do list.
 
-If you want a GUARANTEE that a specific block of Armenian or Georgian text
-renders — rather than relying on per-codepoint fallback — set `FontFamily`
-explicitly to the companion URI on that element. See COMPLETE EXAMPLES,
-Example 5.
+If you want a GUARANTEE that a specific block of polytonic Greek, Armenian or
+Georgian text renders — rather than relying on per-codepoint fallback — set
+`FontFamily` explicitly to the companion URI on that element. See COMPLETE
+EXAMPLES, Example 5.
 
 
 FONT INVENTORY
 ==============
 
-51 `.ttf` files plus 3 `.ttf.manifest` files, in three families.
+64 `.ttf` files plus 4 `.ttf.manifest` files, in four families.
 
 PRIMARY FAMILY — Roboto (37 files)
 -----------------------------------
@@ -287,26 +300,34 @@ aligned with the sibling CodeBrix.Platform.Fonts packages. Those weights
 remain reachable through the variable font's 100..900 axis on a head that
 renders variable fonts.
 
-COMPANION FAMILIES (14 files)
+COMPANION FAMILIES (27 files)
 ------------------------------
-  NotoSansArmenian.ttf + 6 statics   supplies the ARMENIAN script
-  NotoSansGeorgian.ttf + 6 statics   supplies the GEORGIAN script
+  NotoSans.ttf         + 12 statics  supplies POLYTONIC (ancient) GREEK
+  NotoSansArmenian.ttf +  6 statics  supplies the ARMENIAN script
+  NotoSansGeorgian.ttf +  6 statics  supplies the GEORGIAN script
 
-  Both variable fonts declare axes wght 100..900 (default 400) and
-  wdth 62.5..100 (default 100), with 9 named instances each. Neither has an
+  All three variable fonts declare axes wght 100..900 (default 400) and
+  wdth 62.5..100 (default 100), with 9 named instances each. None has an
   italic or slant axis.
 
-  Both static sets are six weights (Light 300 through ExtraBold 800), Normal
-  stretch, UPRIGHT ONLY — upstream publishes no italic face for either
-  family, so italic text in those scripts renders upright. That is an
-  upstream limitation, not a packaging defect.
+  Noto Sans ships six weights (Light 300 through ExtraBold 800) in Normal
+  stretch, UPRIGHT AND ITALIC — 12 statics. Upstream publishes a full italic
+  set for this family, so italic polytonic Greek is real italic, not
+  synthesised.
 
-  Roboto already covers Greek natively, so there is no Greek companion here
-  (unlike the sibling Merriweather package).
+  The Armenian and Georgian static sets are six weights (Light 300 through
+  ExtraBold 800), Normal stretch, UPRIGHT ONLY — upstream publishes no italic
+  face for either family, so italic text in those two scripts renders
+  upright. That is an upstream limitation, not a packaging defect.
+
+  Roboto covers modern monotonic Greek natively; the Noto Sans companion is
+  what adds the polytonic Greek Extended block Roboto lacks. (The sibling
+  Merriweather package pairs with Noto Serif for the same reason.)
 
 Manifests
 ---------
   Roboto.ttf.manifest            36 entries (2 styles x 6 weights x 3 stretches)
+  NotoSans.ttf.manifest          12 entries (2 styles x 6 weights, Normal stretch)
   NotoSansArmenian.ttf.manifest   6 entries (Normal style, Normal stretch)
   NotoSansGeorgian.ttf.manifest   6 entries (Normal style, Normal stretch)
 
@@ -316,15 +337,18 @@ SCRIPT AND CODEPOINT COVERAGE
 
 Derived by parsing the `cmap` table of the shipped font files. Within each
 family, the variable font and every static instance carry the same character
-set (Roboto: 927 mapped codepoints; Noto Sans Armenian: 430; Noto Sans
-Georgian: 509 — the variable font and a static of each were parsed and
-agree).
+set (Roboto: 927 mapped codepoints; Noto Sans: 3094 upright / 3091 italic;
+Noto Sans Armenian: 430; Noto Sans Georgian: 509 — the variable font and a
+static of each were parsed and agree). The three codepoints the Noto Sans
+italics lack are U+10FB, U+20C0 and U+2183; nothing script-relevant.
 
 Scripts covered
 ---------------
   Latin      complete for Western, Central and Eastern European
              orthographies, plus Vietnamese                      (Roboto)
   Greek      modern monotonic Greek                              (Roboto)
+             polytonic (ancient) Greek — the whole Greek Extended
+             block                                     (Noto Sans companion)
   Cyrillic   essentially the whole base block (255 of 256
              codepoints), covering Russian, Ukrainian,
              Belarusian, Bulgarian, Serbian, Macedonian          (Roboto)
@@ -356,6 +380,47 @@ Roboto — Unicode blocks present (mapped codepoints / block size)
   U+FB00-U+FB4F  Alphabetic Presentation Forms               4 / 80
   U+FFF0-U+FFFF  Specials                                    2 / 16
 
+Noto Sans companion — blocks present
+-------------------------------------
+The widest family in the package, and the reason polytonic Greek works.
+
+  U+0020-U+007E  Basic Latin (ASCII)                        95 / 95
+  U+00A0-U+00FF  Latin-1 Supplement                         96 / 96
+  U+0100-U+017F  Latin Extended-A                          128 / 128
+  U+0180-U+024F  Latin Extended-B                          208 / 208
+  U+0250-U+02AF  IPA Extensions                             96 / 96
+  U+02B0-U+02FF  Spacing Modifier Letters                   80 / 80
+  U+0300-U+036F  Combining Diacritical Marks               112 / 112
+  U+0370-U+03FF  Greek and Coptic                          121 / 144
+  U+0400-U+04FF  Cyrillic                                  256 / 256
+  U+0500-U+052F  Cyrillic Supplement                        48 / 48
+  U+1AB0-U+1AFF  Combining Diacriticals Extended            26 / 80
+  U+1D00-U+1D7F  Phonetic Extensions                       128 / 128
+  U+1D80-U+1DBF  Phonetic Extensions Supplement             64 / 64
+  U+1DC0-U+1DFF  Combining Diacriticals Supplement          63 / 64
+  U+1E00-U+1EFF  Latin Extended Additional                 256 / 256
+  U+1F00-U+1FFF  Greek Extended                            233 / 256
+  U+2000-U+206F  General Punctuation                       111 / 112
+  U+2070-U+209F  Superscripts and Subscripts                42 / 48
+  U+20A0-U+20CF  Currency Symbols                           33 / 48
+  U+2100-U+214F  Letterlike Symbols                         80 / 80
+  U+2150-U+218F  Number Forms                               19 / 64
+  U+A700-U+A71F  Modifier Tone Letters                      32 / 32
+  U+A720-U+A7FF  Latin Extended-D                          193 / 224
+  U+AB30-U+AB6F  Latin Extended-E                           60 / 64
+  U+FB00-U+FB4F  Alphabetic Presentation Forms               7 / 80
+  U+FE20-U+FE2F  Combining Half Marks                       16 / 16
+  U+FFF0-U+FFFF  Specials                                    2 / 16
+
+  Greek Extended is 233 / 256 because only 233 of the block's 256 positions
+  are assigned in Unicode: the family is COMPLETE for polytonic Greek. It
+  also carries all four polytonic combining marks Roboto lacks — U+0313
+  psili, U+0314 dasia, U+0342 perispomeni and U+0345 ypogegrammeni — so
+  decomposed as well as precomposed polytonic text renders.
+
+  It carries NO Armenian and only one Georgian codepoint (U+10FB), so it
+  never shadows the two script companions in the fallback order.
+
 Noto Sans Armenian companion — blocks present
 ----------------------------------------------
   U+0530-U+058F  Armenian                                   91 / 96
@@ -386,7 +451,9 @@ at all:
   U+0E00-U+0E7F  Thai
   U+2190-U+21FF  Arrows
   U+1F300+       emoji and pictographs
-  polytonic Greek (the Greek Extended block is essentially empty)
+
+(Polytonic Greek used to be on this list. It no longer is: the Noto Sans
+companion supplies the complete Greek Extended block.)
 
 Spot-checked present in Roboto:  U+1EA1, U+1EF9, U+01B0, U+0110
 (Vietnamese), U+03B1 (Greek), U+0410 (Cyrillic), U+0452 / U+045C / U+045E
@@ -398,10 +465,11 @@ more than the sibling OpenSans package's 6).
 
 Spot-checked ABSENT from Roboto: U+05D0 (Hebrew), U+0531 (Armenian —
 companion supplies it), U+10D0 (Georgian — companion supplies it), U+1F00
-(polytonic Greek), U+20B4 (hryvnia), U+2190 (arrow), U+1F600 (emoji).
+(polytonic Greek — the Noto Sans companion supplies it), U+20B4 (hryvnia —
+Noto Sans supplies it), U+2190 (arrow), U+1F600 (emoji).
 
-Missing-glyph behaviour: the `.notdef` glyph (glyph 0) of Roboto and of both
-companions is a DRAWN glyph, not an empty one. An unsupported codepoint
+Missing-glyph behaviour: the `.notdef` glyph (glyph 0) of Roboto and of all
+three companions is a DRAWN glyph, not an empty one. An unsupported codepoint
 therefore renders as a visible box ("tofu"), which makes coverage gaps
 obvious on screen. (The sibling OpenSans package behaves the opposite way —
 its `.notdef` is empty, so gaps there are invisible.) Never rely on a system
@@ -474,7 +542,7 @@ Example 3 — App.xaml resource, using the descriptor's resource key
 `CODEBRIX-DEVELOP.json` names the resource key an application should use for
 this font: `RobotoFont`. Declare it once in App.xaml and reference it
 everywhere by `{StaticResource}`, so the font URI appears exactly once in the
-whole application. The two companion URIs from `fallbackFontUris` are worth
+whole application. The three companion URIs from `fallbackFontUris` are worth
 declaring alongside it if you ever set them explicitly (Example 5).
 
     <Application
@@ -486,6 +554,7 @@ declaring alongside it if you ever set them explicitly (Example 5).
 
                 <FontFamily x:Key="RobotoFont">ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf</FontFamily>
 
+                <FontFamily x:Key="RobotoGreekFont">ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans.ttf</FontFamily>
                 <FontFamily x:Key="RobotoArmenianFont">ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansArmenian.ttf</FontFamily>
                 <FontFamily x:Key="RobotoGeorgianFont">ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian.ttf</FontFamily>
 
@@ -498,9 +567,9 @@ declaring alongside it if you ever set them explicitly (Example 5).
                FontFamily="{StaticResource RobotoFont}"
                FontWeight="SemiBold" />
 
-The key name `RobotoFont` and the three URIs above are the values taken
+The key name `RobotoFont` and the four URIs above are the values taken
 verbatim from the descriptor; the surrounding ResourceDictionary declaration
-is ordinary XAML, and the two companion key names are your choice (the
+is ordinary XAML, and the three companion key names are your choice (the
 descriptor names only `RobotoFont`).
 
 Example 4 — make Roboto the application-wide default text font
@@ -513,14 +582,26 @@ point, ahead of building the host).
 
 No `#FamilyName` fragment. See COMMON PITFALLS TO AVOID.
 
-Example 5 — Armenian and Georgian text
----------------------------------------
+Example 5 — polytonic Greek, Armenian and Georgian text
+--------------------------------------------------------
 Nothing is required to make the companions available: they ship in this
-package and are never pruned. For text you KNOW is Armenian or Georgian, name
-the companion family directly rather than relying on per-codepoint fallback —
-it is deterministic and it survives every head.
+package and are never pruned. For text you KNOW is polytonic Greek, Armenian
+or Georgian, name the companion family directly rather than relying on
+per-codepoint fallback — it is deterministic and it survives every head.
 
     <StackPanel>
+
+        <!-- Polytonic (ancient) Greek. Roboto has no glyph for any of these
+             codepoints, so naming NotoSans is not an optimisation — it is
+             the difference between text and a row of tofu boxes. -->
+        <TextBlock Text="μῆνιν ἄειδε θεὰ Πηληϊάδεω Ἀχιλῆος"
+                   FontFamily="ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans.ttf" />
+
+        <!-- Noto Sans is the one companion with real italics:
+             {Italic, 400, Normal} -> NotoSans-Italic.ttf -->
+        <TextBlock Text="ἔπεα πτερόεντα"
+                   FontFamily="ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSans.ttf"
+                   FontStyle="Italic" />
 
         <!-- Armenian, SemiBold: the companion manifest entry
              {Normal, 600, Normal} -> NotoSansArmenian-SemiBold.ttf -->
@@ -534,9 +615,11 @@ it is deterministic and it survives every head.
 
     </StackPanel>
 
-Do NOT set `FontStyle="Italic"` or a `FontStretch` other than `Normal` on
-these: the companion manifests have six upright Normal-stretch entries each
-and nothing else.
+Do NOT set `FontStyle="Italic"` or a `FontStretch` other than `Normal` on the
+Armenian and Georgian elements: those two manifests have six upright
+Normal-stretch entries each and nothing else. Noto Sans is the exception —
+it has a real italic for every weight, but still no stretch other than
+`Normal`.
 
 
 MINIMUM VIABLE PROJECT
@@ -561,7 +644,7 @@ integration. A minimal consuming project file:
 Pin whatever version you resolved; this file never states versions because
 they go stale. With that reference in place:
 
-  * the 51 `.ttf` files and the three `.ttf.manifest` files are contributed to
+  * the 64 `.ttf` files and the four `.ttf.manifest` files are contributed to
     the application's asset set,
   * the buildTransitive `.targets` file is auto-imported and prunes the
     static fonts on heads that do not support the manifest,
@@ -596,7 +679,7 @@ PERFORMANCE TIPS
     fire at all.
 
   * Let the head prune. On a head where `SupportsFontManifest` is not
-    `'true'`, the 48 static files are removed from the output — that is a
+    `'true'`, the 60 static files are removed from the output — that is a
     deliberate size win of roughly the whole static set. Do not defeat it by
     hard-referencing static files (Example 2) in code that also has to run on
     those heads.
@@ -622,15 +705,17 @@ COMMON PITFALLS TO AVOID
     fix for anything. The symptom is subtle: text still renders, but
     weight/style/stretch requests stop resolving to the right static instance.
 
-  * There is no italic axis in any of the three variable fonts. On a head
+  * There is no italic axis in any of the four variable fonts. On a head
     where the statics are pruned (`SupportsFontManifest` not `'true'`),
     `FontStyle="Italic"` has no italic face to resolve to and the platform
     will synthesise or ignore it. If real italics matter on such a head, this
     package cannot supply them.
 
-  * The companions have NO italic and NO condensed faces at all, on any head.
-    Italic Armenian and Georgian text renders upright. Six upright weights in
-    Normal stretch is the entire companion surface.
+  * The Armenian and Georgian companions have NO italic and NO condensed
+    faces at all, on any head. Italic text in those two scripts renders
+    upright; six upright weights in Normal stretch is their entire surface.
+    Noto Sans is the exception: it has all six weights in both styles, so
+    italic polytonic Greek is real. No companion has a condensed face.
 
   * `FontWeight="Thin"`, `"ExtraLight"` and `"Black"` have no static file and
     no manifest entry. They work only where the variable font is rendered
@@ -646,13 +731,14 @@ COMMON PITFALLS TO AVOID
     before the stretch, a dash before the weight — `Roboto_SemiCondensed-Bold.ttf`.
     `Roboto-SemiCondensed-Bold.ttf` and `Roboto_SemiCondensed_Bold.ttf` are
     both wrong. The companions use only the dash form
-    (`NotoSansGeorgian-Bold.ttf`), because they have no stretch variants.
+    (`NotoSansGeorgian-Bold.ttf`, `NotoSans-BoldItalic.ttf`), because they
+    have no stretch variants.
 
   * Each manifest is a JSON OBJECT with a `fonts` array, not a bare JSON
     array. Code that does `JsonDocument.Parse(json).RootElement.EnumerateArray()`
     on one throws; you must read the `fonts` property first. And there are
-    THREE manifests here, one per family — code written against the sibling
-    OpenSans package, which has one, will miss two.
+    FOUR manifests here, one per family — code written against the sibling
+    OpenSans package, which has one, will miss three.
 
   * `family_name` in a manifest entry holds a URI, not a typographic family
     name. Do not feed it to an API that expects "Roboto".
@@ -673,7 +759,7 @@ COMMON PITFALLS TO AVOID
   * Do not alter the font bytes. Roboto's copyright statement declares no
     Reserved Font Name, so SIL OFL 1.1 condition 3 does not restrict the
     display name — but the binaries are redistributed unmodified and must
-    stay that way. The same is true of both Noto Sans companions.
+    stay that way. The same is true of all three Noto Sans companions.
 
 
 WHAT THIS PACKAGE DOES NOT DO
@@ -685,9 +771,10 @@ WHAT THIS PACKAGE DOES NOT DO
   * It does not register fonts with the operating system, and it does not
     install anything outside the application's own asset set.
   * It ships no Hebrew, Arabic, Devanagari, Thai, CJK or emoji glyphs, and no
-    polytonic Greek or arrow glyphs.
-  * It ships no italic or condensed companion faces — Armenian and Georgian
-    are upright, Normal-stretch, six weights, full stop.
+    arrow glyphs.
+  * It ships no condensed companion faces, and no italic Armenian or Georgian
+    — those two are upright, Normal-stretch, six weights, full stop. (Noto
+    Sans does ship italics, so polytonic Greek is not subject to this.)
   * It ships no italic variable font for any family, and no Thin, ExtraLight
     or Black STATIC instances of Roboto.
   * It ships no monospace face; that is the sibling
@@ -713,21 +800,22 @@ behaviour is asserted there.
       How to read a manifest correctly: parse the document, take the `fonts`
       property, enumerate the array, and project each entry's font_style /
       font_weight / font_stretch / family_name. Copy this reader if you need
-      to consume a manifest yourself. Also asserts the 36/6/6 entry counts,
-      the six weights, and that the two companion manifests are upright-only.
+      to consume a manifest yourself. Also asserts the 36/12/6/6 entry
+      counts, the six weights, that the Noto Sans manifest carries both
+      styles, and that the Armenian and Georgian manifests are upright-only.
   DescriptorTests.cs
       The CODEBRIX-DEVELOP.json contract as a consumer sees it: schemaVersion
       1, packageId equal to the PackageId, displayName "Roboto", resourceKey
       "RobotoFont", `fontFamilyUri` and every `fallbackFontUri` fragment-free
       and pointing at a font this package actually ships, the fallback list
-      being exactly the two companion families, and `keyboardLayouts`
+      being exactly the three companion families, and `keyboardLayouts`
       containing `ka`, `hy` and `el` with no duplicates.
   ContentFilePresenceTests.cs
-      The 51-file inventory and the exact static filename grammar.
+      The 64-file inventory and the exact static filename grammar.
   TargetsFileTests.cs
       The `.targets` contract: target name, the `_CodeBrixAddLibraryAssets`
       hook, the `SupportsFontManifest` condition, and the assertion that
-      none of the three variable fonts can ever be removed.
+      none of the four variable fonts can ever be removed.
   AssemblyMetadataTests.cs
       That the assembly is named `CodeBrix.Platform.Fonts.Roboto`, targets
       .NET 10, and exports no public types.
@@ -748,8 +836,8 @@ Resource    RobotoFont              Display name: Roboto
 Descriptor  CODEBRIX-DEVELOP.json (nupkg root)
 Targets     CodeBrixRemoveUnusedRoboto, AfterTargets=_CodeBrixAddLibraryAssets
 Prune rule  static fonts removed when SupportsFontManifest != 'true'
-Fallbacks   NotoSansArmenian.ttf then NotoSansGeorgian.ttf — in this package,
-            nothing for a consumer to install or wire up
+Fallbacks   NotoSans.ttf then NotoSansArmenian.ttf then NotoSansGeorgian.ttf
+            — in this package, nothing for a consumer to install or wire up
 
 Weight words -> manifest font_weight
 ------------------------------------
@@ -762,10 +850,11 @@ FontStretch values -> filename infix (Roboto only; companions have none)
   Condensed       _Condensed             Roboto_Condensed-Bold.ttf
   SemiCondensed   _SemiCondensed         Roboto_SemiCondensed-Bold.ttf
 
-All 51 URIs (prefix every one with the URI root above)
+All 64 URIs (prefix every one with the URI root above)
 -------------------------------------------------------
   Variable fonts (never pruned)
     Roboto.ttf                                wght 100-900, wdth 75-100
+    NotoSans.ttf                              wght 100-900, wdth 62.5-100
     NotoSansArmenian.ttf                      wght 100-900, wdth 62.5-100
     NotoSansGeorgian.ttf                      wght 100-900, wdth 62.5-100
 
@@ -811,6 +900,20 @@ All 51 URIs (prefix every one with the URI root above)
     Roboto_SemiCondensed-ExtraBold.ttf          Normal   800
     Roboto_SemiCondensed-ExtraBoldItalic.ttf    Italic   800
 
+  Noto Sans companion — polytonic Greek (Normal stretch, upright + italic)
+    NotoSans-Light.ttf                       Normal   300
+    NotoSans-LightItalic.ttf                 Italic   300
+    NotoSans-Regular.ttf                     Normal   400
+    NotoSans-Italic.ttf                      Italic   400
+    NotoSans-Medium.ttf                      Normal   500
+    NotoSans-MediumItalic.ttf                Italic   500
+    NotoSans-SemiBold.ttf                    Normal   600
+    NotoSans-SemiBoldItalic.ttf              Italic   600
+    NotoSans-Bold.ttf                        Normal   700
+    NotoSans-BoldItalic.ttf                  Italic   700
+    NotoSans-ExtraBold.ttf                   Normal   800
+    NotoSans-ExtraBoldItalic.ttf             Italic   800
+
   Noto Sans Armenian companion (Normal stretch, upright only)
     NotoSansArmenian-Light.ttf               Normal   300
     NotoSansArmenian-Regular.ttf             Normal   400
@@ -829,6 +932,7 @@ All 51 URIs (prefix every one with the URI root above)
 
   Manifests (objects with a `fonts` array)
     Roboto.ttf.manifest                      36 entries
+    NotoSans.ttf.manifest                    12 entries
     NotoSansArmenian.ttf.manifest             6 entries
     NotoSansGeorgian.ttf.manifest             6 entries
 
@@ -838,6 +942,9 @@ Software-keyboard layouts declared supported (38 — all of them)
   da, no, sv, fi, is, lt, lv, et, pl, cs, sk, hu, ro, hr, sr-Latn, ru, uk,
   be, bg, sr, mk, ka, hy
 
-  `ka` and `hy` come from the two companion families, not from Roboto.
+  `ka` and `hy` come from the Armenian and Georgian companions, not from
+  Roboto. `el` comes from Roboto itself — but only monotonic Greek; POLYTONIC
+  Greek comes from the Noto Sans companion, and has no keyboard layout id of
+  its own in this list.
 
 Missing glyph renders as: a tofu box (drawn .notdef), never a blank gap.

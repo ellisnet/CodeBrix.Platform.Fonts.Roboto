@@ -17,7 +17,7 @@ TESTS — the only non-package content
   tests/CodeBrix.Platform.Fonts.Roboto.Tests/
 
 The test project is not shipped in the NuGet package. It is an asset-, JSON-
-and metadata-inspection suite: it links the packaged font files, the three
+and metadata-inspection suite: it links the packaged font files, the four
 manifests, the `.uprimarker`, the CODEBRIX-DEVELOP.json descriptor and the
 buildTransitive `.targets` file into its own output under `TestAssets/`, then
 asserts the file inventory, the manifest shapes, the descriptor contract and
@@ -43,9 +43,9 @@ WHAT YOU WILL NOT FIND HERE
   * No sample application. To see the fonts in use, reference the NuGet
     package from a CodeBrix.Platform application and follow the COMPLETE
     EXAMPLES section of AGENT-README.txt — including Example 5, which shows
-    the Armenian and Georgian companion families.
+    the polytonic Greek, Armenian and Georgian companion families.
   * No font-generation, subsetting or conversion tool. The `.ttf` files are
-    checked in exactly as received from upstream, apart from the three
+    checked in exactly as received from upstream, apart from the four
     variable-font filename renames recorded in THIRD-PARTY-NOTICES.txt.
   * No generator for the `keyboardLayouts` array in CODEBRIX-DEVELOP.json.
     That array is produced by a developer-run tool that lives outside this

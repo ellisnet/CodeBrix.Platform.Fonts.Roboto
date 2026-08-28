@@ -28,10 +28,20 @@ internal static class TestAssetPaths
 
     /// <summary>
     /// The companion families that supply the scripts Roboto itself does not
-    /// carry: Armenian and Georgian. Each ships a variable font plus its own
-    /// manifest. (Roboto already covers Greek, so no Greek companion is needed.)
+    /// carry: polytonic (ancient) Greek, Armenian and Georgian. Each ships a
+    /// variable font plus its own manifest. Roboto covers only MONOTONIC
+    /// Greek, so Noto Sans is here for the Greek Extended block — the same
+    /// role Noto Serif plays in the sibling Merriweather package.
     /// </summary>
     public static string[] CompanionFamilies { get; } =
+        ["NotoSans", "NotoSansArmenian", "NotoSansGeorgian"];
+
+    /// <summary>
+    /// The companion families that ship upright faces only, because upstream
+    /// publishes no italic for them. Noto Sans is deliberately absent: it does
+    /// have a full italic set.
+    /// </summary>
+    public static string[] UprightOnlyCompanionFamilies { get; } =
         ["NotoSansArmenian", "NotoSansGeorgian"];
 
     public static string CompanionFontPath(string family) =>

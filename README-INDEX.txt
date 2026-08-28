@@ -11,10 +11,10 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
 ------------------------------------------------------------------
   AGENT-README.txt
       CodeBrix.Platform.Fonts.Roboto.OflLicenseForever — the Roboto variable
-      font plus 36 static instances, the Noto Sans Armenian and Noto Sans
-      Georgian companion families, three static-instance manifests and the
-      build-time asset wiring, for .NET 10 and CodeBrix.Platform
-      applications.
+      font plus 36 static instances, the Noto Sans (polytonic Greek), Noto
+      Sans Armenian and Noto Sans Georgian companion families, four
+      static-instance manifests and the build-time asset wiring, for .NET 10
+      and CodeBrix.Platform applications.
 
 MAINTAINER AND EXTRAS
 ---------------------
