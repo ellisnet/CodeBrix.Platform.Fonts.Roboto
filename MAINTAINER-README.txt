@@ -55,6 +55,7 @@ REPOSITORY LAYOUT
     OFL.txt                       SIL OFL 1.1, identical text (packed)
     THIRD-PARTY-NOTICES.txt       per-file attribution (packed)
     icon-codebrix-128.png         package icon (packed)
+    global.json                   selects the test runner; see TESTING (not packed)
     AGENTS.md, CLAUDE.md, .clinerules, .cursorrules,
     .cursor/rules/agent-readme.mdc, .windsurfrules,
     .github/copilot-instructions.md, .junie/guidelines.md
@@ -88,8 +89,9 @@ REPOSITORY LAYOUT
       TestAssetPaths.cs           single place that computes test asset paths,
                                   including the CompanionFamilies array
 
-The `.slnx` carries a "Solution Items" folder (AGENT-README.txt,
-CODEBRIX-DEVELOP.json, icon-codebrix-128.png, LICENSE, OFL.txt, README.md,
+The `.slnx` carries a "Solution Items" folder (.gitignore, AGENT-README.txt,
+CODEBRIX-DEVELOP.json, EXTRAS-README.txt, global.json, icon-codebrix-128.png,
+LICENSE, MAINTAINER-README.txt, OFL.txt, README-INDEX.txt, README.md,
 THIRD-PARTY-NOTICES.txt), a nested "Solution Items/src" folder holding the
 `.targets` file, a "Tests" folder holding the test project, and the library
 project at the root.
@@ -100,6 +102,10 @@ BUILDING
 
     dotnet restore CodeBrix.Platform.Fonts.Roboto.slnx
     dotnet build   CodeBrix.Platform.Fonts.Roboto.slnx
+
+Requirements: the .NET 10 SDK. `global.json` at the repository root does NOT
+pin an SDK version, so the newest installed .NET 10 SDK is still used. It
+exists solely to select the test runner - see TESTING.
 
 The library project sets `GeneratePackageOnBuild=true`, so an ordinary build
 also produces a `.nupkg` under src/.../bin/<Configuration>/. There is no
@@ -115,6 +121,18 @@ TESTING
 
     dotnet test CodeBrix.Platform.Fonts.Roboto.slnx
 
+THE TEST RUNNER IS Microsoft.Testing.Platform (MTP), selected by `global.json`
+at the repository root:
+
+    { "test": { "runner": "Microsoft.Testing.Platform" } }
+
+That file is load-bearing: because the setting lives in `global.json` rather
+than in the csproj, it applies to every `dotnet test` run anywhere in the
+repository, including CI. It has no `sdk` section and pins no SDK version. Do
+NOT delete it - without it `dotnet test` silently falls back to the older
+VSTest bridge. There is no coverage collector in this repository; the test
+project references no coverlet package.
+
 xUnit v3 with SilverAssertions; no opt-in environment variables, no special
 prep, no network. Tests are pure file, JSON and metadata inspection and run
 everywhere.
@@ -123,8 +141,11 @@ How the tests see the assets: the test `.csproj` links the font files, the
 manifests, the `.uprimarker`, the descriptor and the `.targets` file into the
 test output under `TestAssets/`, with `CopyToOutputDirectory=PreserveNewest`.
 `TestAssetPaths` resolves everything from `AppContext.BaseDirectory` +
-`TestAssets/`, and also exposes `CompanionFamilies` (the two Noto Sans family
-names) plus `CompanionFontPath` / `CompanionManifestPath` helpers. If you add
+`TestAssets/`, and also exposes `CompanionFamilies` (the three Noto Sans family
+names) and `UprightOnlyCompanionFamilies` (the two of those that ship upright
+faces only, because upstream publishes no italic for them - Noto Sans is
+deliberately absent, it has a full italic set) plus `CompanionFontPath` /
+`CompanionManifestPath` helpers. If you add
 a new packed asset, add the matching `<None ... Link="TestAssets\...">` item
 or the tests will not see it.
 

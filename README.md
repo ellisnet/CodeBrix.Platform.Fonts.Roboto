@@ -1,13 +1,30 @@
 # CodeBrix.Platform.Fonts.Roboto
 
 A redistribution of the Roboto font family packaged as a CodeBrix-family NuGet library for .NET 10 applications.
-CodeBrix.Platform.Fonts.Roboto is a content-files font package for CodeBrix.Platform-forked applications — supplying the Roboto variable font and its static instances as build-time assets — and is equally usable as a plain content-files NuGet in any .NET 10 project that wants the Roboto font set.
+CodeBrix.Platform.Fonts.Roboto is a content-files font package for CodeBrix.Platform applications — supplying the Roboto variable font and its static instances as build-time assets — and is equally usable as a plain content-files NuGet in any .NET 10 project that wants the Roboto font set.
 Roboto covers the Latin and Cyrillic scripts and modern (monotonic) Greek, but not the polytonic Greek of the Greek Extended block, and not Armenian or Georgian, so this package also bundles three Noto Sans companion families that supply those scripts in a matching sans design.
 The library has no managed dependencies other than .NET, and is provided as a .NET 10 library and associated `CodeBrix.Platform.Fonts.Roboto.OflLicenseForever` NuGet package.
 
 CodeBrix.Platform.Fonts.Roboto supports applications and assemblies that target Microsoft .NET version 10.0 and later.
 Microsoft .NET version 10.0 is a Long-Term Supported (LTS) version of .NET, and was released on Nov 11, 2025; and will be actively supported by Microsoft until Nov 14, 2028.
 Please update your C#/.NET code and projects to the latest LTS version of Microsoft .NET.
+
+## Installation
+
+```
+dotnet add package CodeBrix.Platform.Fonts.Roboto.OflLicenseForever
+```
+
+Note that the NuGet package ID and the assembly name are different - there is no package named plain `CodeBrix.Platform.Fonts.Roboto`:
+
+* NuGet package ID: `CodeBrix.Platform.Fonts.Roboto.OflLicenseForever`
+* Assembly, content folder and font-URI name: `CodeBrix.Platform.Fonts.Roboto` - i.e. `ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf`
+
+The `.OflLicenseForever` suffix is a CodeBrix family convention that records the license the package will always be published under. Use the un-suffixed name in every font URI; use the suffixed name only in `dotnet add package` and in the `.targets` filename.
+
+The package has no NuGet dependencies of its own, and there is no companion package to add: the Noto Sans, Noto Sans Armenian and Noto Sans Georgian faces are files inside this package. It also sets `PackageRequireLicenseAcceptance`, so a restore in an interactive tool prompts for license acceptance.
+
+There is no API to call and no namespace to import - the payload is font data, a font descriptor and a build-time MSBuild `.targets` file.
 
 ## CodeBrix.Platform.Fonts.Roboto supports:
 
@@ -56,10 +73,19 @@ global::CodeBrix.Platform.UI.FeatureConfiguration.Font.DefaultTextFontFamily =
 
 Note that the font URI carries no `#FamilyName` fragment. CodeBrix.Platform strips such a fragment before resolving the font, and leaving it on the value assigned to `DefaultTextFontFamily` prevents the startup font-manifest preload from finding the manifest.
 
+## Documentation
+
+The NuGet package includes `AGENT-README.txt`, a complete reference and usage guide written for AI coding agents - point your agent at that file when it is wiring this font package into an application.
+
+Additional sample code and usage examples are available in the `CodeBrix.Platform.Fonts.Roboto.Tests` project:
+https://github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto/tree/main/tests/CodeBrix.Platform.Fonts.Roboto.Tests
+
 ## License
 
-The entire package — the library code, the `.targets` file, the packaging wrapper, and the bundled Roboto and Noto Sans `.ttf` font files — is licensed under the SIL Open Font License, Version 1.1. see: https://en.wikipedia.org/wiki/SIL_Open_Font_License
+CodeBrix.Platform.Fonts.Roboto is licensed under the SIL Open Font License, Version 1.1 - see the
+[LICENSE](https://github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto/blob/main/LICENSE) file.
 
-The full license text is bundled with this repository as `OFL.txt` at the repository root and is also packaged inside the produced NuGet under the same name. The package is published under the SPDX expression `OFL-1.1`.
+The entire package — the library code, the `.targets` file, the packaging wrapper, and the bundled Roboto and Noto Sans `.ttf` font files — is covered by that license. Its full text is bundled with this repository as `OFL.txt` at the repository root and is also packaged inside the produced NuGet under the same name. The package is published under the SPDX expression `OFL-1.1`.
 
-See `THIRD-PARTY-NOTICES.txt` for the full attribution of all four bundled font families.
+For licensing and provenance information about the open source code included in
+this package, see [THIRD-PARTY-NOTICES.txt](https://github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto/blob/main/THIRD-PARTY-NOTICES.txt).
