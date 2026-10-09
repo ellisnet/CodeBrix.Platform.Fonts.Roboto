@@ -28,15 +28,15 @@ There is no API to call and no namespace to import - the payload is font data, a
 
 ## CodeBrix.Platform.Fonts.Roboto supports:
 
-* The Roboto variable font (`Roboto.ttf`) covering the full weight axis (100-900) and width axis, used directly on every platform.
-* 36 static `.ttf` font files covering the Light/Regular/Medium/SemiBold/Bold/ExtraBold weights in Normal, Italic, Condensed, Condensed-Italic, SemiCondensed, and SemiCondensed-Italic stretches — for platforms that resolve fonts through the static-instance manifest.
+* The Roboto variable font (`Roboto.ttf`) covering the full weight axis (100-900) and width axis, always shipped and never pruned.
+* 36 static `.ttf` font files covering the Light/Regular/Medium/SemiBold/Bold/ExtraBold weights in Normal, Italic, Condensed, Condensed-Italic, SemiCondensed, and SemiCondensed-Italic stretches — which every CodeBrix.Platform head resolves through the static-instance manifest.
 * Three companion font families that extend script coverage beyond what Roboto itself carries:
   * **Noto Sans** (`NotoSans.ttf` plus 12 static instances, upright and italic) — polytonic (ancient) Greek. Roboto carries only monotonic Greek: 75 code points of Greek and Coptic and a single code point of the Greek Extended block, with none of the combining marks polytonic would otherwise be composed from. Noto Sans supplies all 233 assigned Greek Extended code points.
   * **Noto Sans Armenian** (`NotoSansArmenian.ttf` plus 6 static instances) — the Armenian script.
   * **Noto Sans Georgian** (`NotoSansGeorgian.ttf` plus 6 static instances) — the Georgian script.
 * A `.ttf.manifest` JSON file per family that maps `font_style` / `font_weight` / `font_stretch` triples to the matching static font file.
 * A `CODEBRIX-DEVELOP.json` descriptor that tells CodeBrix.Develop how to wire this font into a generated application and which software-keyboard layouts the package's glyph coverage supports.
-* A `buildTransitive` MSBuild `.targets` file (hooking into the CodeBrix.Platform `_CodeBrixAddLibraryAssets` target) that prunes the redundant static font files at build time on platforms that don't need them, while always keeping the four variable fonts available.
+* A `buildTransitive` MSBuild `.targets` file (hooking into the CodeBrix.Platform `_CodeBrixAddLibraryAssets` target) that prunes the static font files at build time where `SupportsFontManifest` is not `true` (every CodeBrix.Platform head sets it, so heads keep them), while always keeping the four variable fonts available.
 * The CodeBrix `.uprimarker` file so CodeBrix.Platform build pipelines discover the package as a UPRI-bearing font asset library.
 
 ## Sample Code
@@ -71,7 +71,7 @@ global::CodeBrix.Platform.UI.FeatureConfiguration.Font.DefaultTextFontFamily =
     "ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf";
 ```
 
-Note that the font URI carries no `#FamilyName` fragment. CodeBrix.Platform strips such a fragment before resolving the font, and leaving it on the value assigned to `DefaultTextFontFamily` prevents the startup font-manifest preload from finding the manifest.
+Note that the font URI carries no `#FamilyName` fragment. CodeBrix.Platform strips such a fragment before resolving the font, so it buys nothing.
 
 ## Documentation
 

@@ -111,11 +111,7 @@ Examples:
     ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/NotoSansGeorgian.ttf
 
 Never append a `#FamilyName` fragment to these URIs. CodeBrix.Platform strips
-the fragment before resolving the font, so it buys nothing — and on the value
-assigned to `FeatureConfiguration.Font.DefaultTextFontFamily` it actively
-breaks the startup font-manifest preload, because the ".manifest" suffix the
-preload appends then lands inside the URI fragment and is dropped by
-`Uri.PathAndQuery`.
+the fragment before resolving the font, so it buys nothing.
 
 The one C# symbol a consumer typically touches lives in CodeBrix.Platform,
 not here:
@@ -441,8 +437,8 @@ Noto Sans Georgian companion — blocks present
   plus the same Latin subset shape as the Armenian companion.
   It carries NO Cyrillic and NO Greek.
 
-Blocks absent from the whole package — text in these scripts will not render
-at all:
+Blocks absent from the whole package — no font in it has a glyph for text in
+these scripts:
 
   U+0590-U+05FF  Hebrew          (the sibling OpenSans package has this;
                                   Roboto does not)
@@ -468,12 +464,21 @@ companion supplies it), U+10D0 (Georgian — companion supplies it), U+1F00
 (polytonic Greek — the Noto Sans companion supplies it), U+20B4 (hryvnia —
 Noto Sans supplies it), U+2190 (arrow), U+1F600 (emoji).
 
-Missing-glyph behaviour: the `.notdef` glyph (glyph 0) of Roboto and of all
-three companions is a DRAWN glyph, not an empty one. An unsupported codepoint
-therefore renders as a visible box ("tofu"), which makes coverage gaps
-obvious on screen. (The sibling OpenSans package behaves the opposite way —
-its `.notdef` is empty, so gaps there are invisible.) Never rely on a system
-font to fill a gap; CodeBrix.Platform does not fall back to system fonts.
+Missing-glyph behaviour: the `.notdef` glyph (glyph 0) of Roboto and of
+all three companions is a DRAWN glyph, not an empty one. An unsupported
+codepoint that no other font supplies therefore renders as a visible box
+("tofu"), which makes coverage gaps obvious on screen. (The sibling
+OpenSans package behaves the opposite way — its `.notdef` is empty, so
+gaps there are invisible.) By default CodeBrix.Platform looks for a
+missing character first in the
+framework's symbols font, then in
+`FeatureConfiguration.Font.FallbackFontFamilies` (empty by default) and
+then in the host machine's installed fonts; setting
+`FeatureConfiguration.Font.RestrictToEmbeddedFonts = true` before the
+first text is measured confines it to the fonts the application ships (the
+PlayTest head always turns it on; the frame-buffer emulated head turns it
+on when its launch contract asks for font isolation). Do not rely on a
+host font to fill a gap: ship the fonts your text needs.
 
 
 COMPLETE EXAMPLES
@@ -675,8 +680,7 @@ PERFORMANCE TIPS
 
   * Setting `DefaultTextFontFamily` is cheaper than setting `FontFamily` on
     every element, and it lets the startup font-manifest preload warm the
-    manifest once. Keeping the URI fragment-free is what makes that preload
-    fire at all.
+    manifest once.
 
   * Let the head prune. On a head where `SupportsFontManifest` is not
     `'true'`, the 60 static files are removed from the output — that is a
@@ -688,22 +692,19 @@ PERFORMANCE TIPS
     avoids per-codepoint fallback work at layout time, on top of being more
     predictable.
 
-  * The variable font covers weights 100-900 continuously, so on a
-    manifest-capable head you can request Thin, ExtraLight, Black and every
-    intermediate weight without shipping more files.
+  * On a manifest-capable head (every CodeBrix.Platform head) a weight
+    request resolves through the manifest to the nearest shipped static
+    instance, so Thin, ExtraLight, Black and every intermediate weight snap
+    to one of the six static weights (Light 300 through ExtraBold 800);
+    CodeBrix.Platform does not apply the variable font's weight axis.
 
 
 COMMON PITFALLS TO AVOID
 ========================
 
   * NEVER append `#FamilyName` to a font URI. CodeBrix.Platform strips the
-    fragment during resolution, so it never helps — and on the value assigned
-    to `FeatureConfiguration.Font.DefaultTextFontFamily` it silently disables
-    the startup manifest preload, because the ".manifest" suffix the preload
-    appends lands inside the fragment and is dropped by `Uri.PathAndQuery`.
-    Older samples used a `#Roboto` form; that was inherited convention, not a
-    fix for anything. The symptom is subtle: text still renders, but
-    weight/style/stretch requests stop resolving to the right static instance.
+    fragment during resolution, so it never helps. Older samples used a
+    `#Roboto` form; that was inherited convention, not a fix for anything.
 
   * There is no italic axis in any of the four variable fonts. On a head
     where the statics are pruned (`SupportsFontManifest` not `'true'`),
@@ -718,9 +719,10 @@ COMMON PITFALLS TO AVOID
     italic polytonic Greek is real. No companion has a condensed face.
 
   * `FontWeight="Thin"`, `"ExtraLight"` and `"Black"` have no static file and
-    no manifest entry. They work only where the variable font is rendered
-    with its axis applied; on a static-manifest head they fall back to the
-    platform's nearest-match rule, not to a matching face.
+    no manifest entry. No CodeBrix.Platform code applies the variable font's
+    weight axis, and every CodeBrix.Platform head resolves through the
+    manifest, so they snap to the nearest static instance, not to a
+    matching face.
 
   * `Roboto-RegularItalic.ttf` does not exist. The Regular italic is
     `Roboto-Italic.ttf` (and `Roboto_Condensed-Italic.ttf`,
@@ -783,8 +785,9 @@ WHAT THIS PACKAGE DOES NOT DO
   * It does not set `SupportsFontManifest`; it only reads it.
   * It does not make itself the default font. You must set
     `DefaultTextFontFamily` or a `FontFamily` yourself.
-  * It does not fall back to a system font for missing glyphs. Missing
-    codepoints render as tofu boxes.
+  * It supplies no fallback font beyond its companions. A missing codepoint
+    that no other font supplies (see FallbackFontFamilies and
+    RestrictToEmbeddedFonts above) renders as a tofu box.
 
 
 WORKING EXAMPLES ON GITHUB
